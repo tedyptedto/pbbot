@@ -9,7 +9,7 @@ copytraders = [
     {'discordUser':'LuaN', 'bbUser':'luantesting', 'bbCode':"y3R6ru2Yv6mVK3t7bebfJQ=="},
     {'discordUser':'mani', 'bbUser':'manicptlowrisk', 'bbCode':"JwT+a21FcgJXHhs6+qVxZw=="},
     {'discordUser':'mani', 'bbUser':'manicptrndr', 'bbCode':"ciOb3vGv0dp8JKJp4WTmeg=="},
-    {'discordUser':'xaocarlo', 'bbUser':'xaocarlo', 'bbCode':"JKuwFA2ebE%2BUhjKrItsMbA=="},
+    {'discordUser':'xaocarlo', 'bbUser':'xaocarlo', 'bbCode':"JKuwFA2ebE+UhjKrItsMbA=="},
 ]
 
 # Timestamp actuel 
