@@ -16,6 +16,12 @@ import os
 import httpx
 import json
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.schedulers.background import BackgroundScheduler
+
+base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/')+'/'
+
 intents = discord.Intents.default()
 # intents.message_content = True
 
@@ -82,5 +88,18 @@ async def check_traders(ctx):
 
     await ctx.send(embed=embed)
 
-base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/')+'/'
+async def cronFunction():
+    global base_dir
+    channelId = open(base_dir+"/config/channel_id.txt", 'r').read()
+    channel = bot.get_channel(int(channelId))
+    await channel.send('test')
+
+
+
+scheduler = AsyncIOScheduler()
+scheduler.add_job(cronFunction, 'interval', seconds=5)
+# scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
+scheduler.start()
+
+
 bot.run(open(base_dir+"/config/token.txt", 'r').read())
