@@ -89,8 +89,8 @@ async def check_traders(ctx):
 async def cronFunction():
     global channelId
     channel = bot.get_channel(int(channelId))
-    await channel.send('test')
-
+    
+    await check_traders(channel)
 
 
 scheduler = AsyncIOScheduler()
