@@ -21,6 +21,8 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.background import BackgroundScheduler
 
 base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/')+'/'
+channelId = open(base_dir+"/config/channel_id.txt", 'r').read()
+discordBotId = open(base_dir+"/config/token.txt", 'r').read()
 
 intents = discord.Intents.default()
 if 'message_content' in intents : 
@@ -85,8 +87,7 @@ async def check_traders(ctx):
 
 
 async def cronFunction():
-    global base_dir
-    channelId = open(base_dir+"/config/channel_id.txt", 'r').read()
+    global channelId
     channel = bot.get_channel(int(channelId))
     await channel.send('test')
 
@@ -97,5 +98,4 @@ scheduler.add_job(cronFunction, 'interval', seconds=5)
 # scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
 scheduler.start()
 
-
-bot.run(open(base_dir+"/config/token.txt", 'r').read())
+bot.run(discordBotId)
