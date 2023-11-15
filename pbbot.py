@@ -21,7 +21,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.background import BackgroundScheduler
 
 base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/')+'/'
-channelId = open(base_dir+"/config/channel_id.txt", 'r').read()
+channelId = int(open(base_dir+"/config/channel_id.txt", 'r').read())
 discordBotId = open(base_dir+"/config/token.txt", 'r').read()
 
 intents = discord.Intents.default()
@@ -44,6 +44,12 @@ async def on_ready():
 
 @bot.command()
 async def check_traders(ctx):
+
+    global channelId
+    if ctx.channel.id != channelId:
+        print('From not authorized channel')
+        return
+
     timestamp = int(time.time() * 1000)
     embed = discord.Embed(title="Copy Traders Information", color=discord.Color(int("2b2d31", 16)))
 
@@ -88,14 +94,13 @@ async def check_traders(ctx):
 
 async def cronFunction():
     global channelId
-    channel = bot.get_channel(int(channelId))
+    channel = bot.get_channel(channelId)
     
     await check_traders(channel)
 
 
 scheduler = AsyncIOScheduler()
-scheduler.add_job(cronFunction, 'interval', seconds=5)
-# scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
+scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
 scheduler.start()
 
 bot.run(discordBotId)
