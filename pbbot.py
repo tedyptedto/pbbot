@@ -1,5 +1,6 @@
 # pip install apscheduler
 # pip install discord
+# pip install httpx[http2]
 # https://github.com/Rapptz/discord.py
 # créer le bot : https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token
 #
@@ -12,6 +13,8 @@ import asyncio
 import time
 from urllib.parse import quote
 import os
+import httpx
+import json
 
 intents = discord.Intents.default()
 # intents.message_content = True
@@ -39,31 +42,33 @@ async def check_traders(ctx):
 
     traders_info = []
 
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient(http2=True) as session:
         for infos in copytraders:
             url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
             print({url})
+            HEADERS = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
+            }
+
             try:
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        json_data = await response.json()
-                        followers = json_data['result']['currentFollowerCount']
-                        stability = json_data['result']['stableScoreLevelFormat']
-                        roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
-                        aum = int(json_data['result']['aumE8']) / 100000000
+                response = await session.get(url, headers=HEADERS) 
+                # print(response.text)
+                json_data = json.loads(response.text)
+                followers = json_data['result']['currentFollowerCount']
+                stability = json_data['result']['stableScoreLevelFormat']
+                roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
+                aum = int(json_data['result']['aumE8']) / 100000000
 
-                        fire_emoji = "🔥" if roi30j > 20 else ""
-                        
-                        trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
-                                      f"ROI (30 days): {roi30j}% {fire_emoji}\n" \
-                                      f"Followers: {followers}\n" \
-                                      f"AUM: {aum} USDT\n" \
-                                      f"Stability: {stability}"
+                fire_emoji = "🔥" if roi30j > 20 else ""
+                
+                trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
+                                f"ROI (30 days): {roi30j}% {fire_emoji}\n" \
+                                f"Followers: {followers}\n" \
+                                f"AUM: {aum} USDT\n" \
+                                f"Stability: {stability}"
 
-                        traders_info.append((roi30j, trader_info))
+                traders_info.append((roi30j, trader_info))
 
-                    else:
-                        await ctx.send(f"Request failed for code {infos}")
 
             except Exception as e:
                 print(f"An error occurred: {e}")
