@@ -1,45 +1,81 @@
-import requests
+# pip install apscheduler
+# pip install discord
+# https://github.com/Rapptz/discord.py
+# créer le bot : https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token
+#
+#
+import string
+import discord
+from discord.ext import commands
+import aiohttp
+import asyncio
 import time
-import json
 from urllib.parse import quote
+import os
 
+intents = discord.Intents.default()
+# intents.message_content = True
 
-#
-#   @TODO : Send a message to a discord WebHook (more secure)
-#
+bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Code list
 copytraders = [
-    {'discordUser':'tedyptedto', 'bbUser':'tedyptedtoCpTr', 'bbCode':"VAfEwFPZdNdfYGWiwy7V0g=="},
-    {'discordUser':'LuaN', 'bbUser':'luantesting', 'bbCode':"y3R6ru2Yv6mVK3t7bebfJQ=="},
-    {'discordUser':'mani', 'bbUser':'manicptlowrisk', 'bbCode':"JwT+a21FcgJXHhs6+qVxZw=="},
-    {'discordUser':'mani', 'bbUser':'manicptrndr', 'bbCode':"ciOb3vGv0dp8JKJp4WTmeg=="},
-    {'discordUser':'xaocarlo', 'bbUser':'xaocarlo', 'bbCode':"JKuwFA2ebE+UhjKrItsMbA=="},
+    {'discordUser': 'xaocarlo', 'bbUser': 'xaocarlo', 'bbCode': "JKuwFA2ebE%2BUhjKrItsMbA%3D%3D"},
+    {'discordUser': 'LuaN', 'bbUser': 'luantesting', 'bbCode': "y3R6ru2Yv6mVK3t7bebfJQ%3D%3D"},
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D"},
+    {'discordUser': 'mani', 'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D"},
+    {'discordUser': 'tedyptedto', 'bbUser': 'tedyptedtoCpTr', 'bbCode': "VAfEwFPZdNdfYGWiwy7V0g%3D%3D"},
 ]
 
-# Timestamp actuel 
-timestamp = int(time.time() * 1000)
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user.name}')
 
-print(f"Please wait")
-for infos in copytraders:
-    encoded_code = quote(infos['bbCode'], safe='')
-    url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={encoded_code}"
+@bot.command()
+async def check_traders(ctx):
+    timestamp = int(time.time() * 1000)
+    await ctx.send(f"Please wait i am getting the datas")
 
-    # print(url)
+    embed = discord.Embed(title="Copy Traders Information", color=discord.Color(int("2b2d31", 16)))
 
-    response = requests.get(url)
+    traders_info = []
 
-    if response.status_code == 200:
-        json_data = response.json()
+    async with aiohttp.ClientSession() as session:
+        for infos in copytraders:
+            url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
+            print({url})
+            try:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        json_data = await response.json()
+                        followers = json_data['result']['currentFollowerCount']
+                        stability = json_data['result']['stableScoreLevelFormat']
+                        roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
+                        aum = int(json_data['result']['aumE8']) / 100000000
 
-        # print(json.dumps(json_data, indent=4))
-        # print("Contenu JSON pour le code", infos['code'], ":", json_data)
-        followers = json_data['result']['currentFollowerCount']
-        stability = json_data['result']['stableScoreLevelFormat']
-        roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
-        aum = int(json_data['result']['aumE8']) / 100000000
+                        fire_emoji = "🔥" if roi30j > 20 else ""
+                        
+                        trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
+                                      f"ROI (30 days): {roi30j}% {fire_emoji}\n" \
+                                      f"Followers: {followers}\n" \
+                                      f"AUM: {aum} USDT\n" \
+                                      f"Stability: {stability}"
 
-        print(f"@{infos['discordUser']} {infos['bbUser']} => {roi30j}% https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={encoded_code} ({followers} followers) (AUM {aum} USDT)")
+                        traders_info.append((roi30j, trader_info))
 
-    else:
-        print("La requête a échoué pour le code", infos)
+                    else:
+                        await ctx.send(f"Request failed for code {infos}")
+
+            except Exception as e:
+                print(f"An error occurred: {e}")
+
+    traders_info.sort(reverse=True, key=lambda x: x[0])
+
+    embed.description = "\u200b"
+
+    for i, (roi, trader_info) in enumerate(traders_info, start=1):
+        embed.add_field(name=f"", value=trader_info, inline=True)
+
+    await ctx.send(embed=embed)
+
+base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/')+'/'
+bot.run(open(base_dir+"/config/token.txt", 'r').read())
