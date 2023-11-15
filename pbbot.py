@@ -23,7 +23,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/')+'/'
 
 intents = discord.Intents.default()
-# intents.message_content = True
+if 'message_content' in intents : 
+    intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -42,23 +43,19 @@ async def on_ready():
 @bot.command()
 async def check_traders(ctx):
     timestamp = int(time.time() * 1000)
-    await ctx.send(f"Please wait i am getting the datas")
-
     embed = discord.Embed(title="Copy Traders Information", color=discord.Color(int("2b2d31", 16)))
 
     traders_info = []
-
+    message = await ctx.send("Please wait, I am getting the data...")
     async with httpx.AsyncClient(http2=True) as session:
         for infos in copytraders:
             url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
-            print({url})
             HEADERS = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
             }
 
             try:
                 response = await session.get(url, headers=HEADERS) 
-                # print(response.text)
                 json_data = json.loads(response.text)
                 followers = json_data['result']['currentFollowerCount']
                 stability = json_data['result']['stableScoreLevelFormat']
@@ -75,7 +72,6 @@ async def check_traders(ctx):
 
                 traders_info.append((roi30j, trader_info))
 
-
             except Exception as e:
                 print(f"An error occurred: {e}")
 
@@ -85,8 +81,8 @@ async def check_traders(ctx):
 
     for i, (roi, trader_info) in enumerate(traders_info, start=1):
         embed.add_field(name=f"", value=trader_info, inline=True)
+    await message.edit(content="", embed=embed)  # Edytowanie nowej wiadomości
 
-    await ctx.send(embed=embed)
 
 async def cronFunction():
     global base_dir
