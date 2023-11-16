@@ -20,23 +20,63 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.background import BackgroundScheduler
 
+def get_arrow(current, previous):
+    try:
+        current = str(current)
+        previous = str(previous)
+        if current > previous:
+            return " | **↗**"
+        elif current < previous:
+            return " | **↘**"
+        else:
+            return ""
+    except ValueError:
+        return "❌"
+
 base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/')+'/'
 channelId = int(open(base_dir+"/config/channel_id.txt", 'r').read())
 discordBotId = open(base_dir+"/config/token.txt", 'r').read()
 
 intents = discord.Intents.default()
-if 'message_content' in intents : 
-    intents.message_content = True
+intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 copytraders = [
-    {'discordUser': 'xaocarlo', 'bbUser': 'xaocarlo', 'bbCode': "JKuwFA2ebE%2BUhjKrItsMbA%3D%3D"},
-    {'discordUser': 'LuaN', 'bbUser': 'luantesting', 'bbCode': "y3R6ru2Yv6mVK3t7bebfJQ%3D%3D"},
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D"},
-    {'discordUser': 'mani', 'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D"},
-    {'discordUser': 'tedyptedto', 'bbUser': 'tedyptedtoCpTr', 'bbCode': "VAfEwFPZdNdfYGWiwy7V0g%3D%3D"},
+    {'bbUser': 'xaocarlo', 'bbCode': "JKuwFA2ebE%2BUhjKrItsMbA%3D%3D"},
+    {'bbUser': 'luantesting', 'bbCode': "y3R6ru2Yv6mVK3t7bebfJQ%3D%3D"},
+    {'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D"},
+    {'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D"},
+    {'bbUser': 'tedyptedtoCpTr', 'bbCode': "VAfEwFPZdNdfYGWiwy7V0g%3D%3D"},
 ]
+
+stats_file = base_dir + "/config/stats.json"
+
+def check_or_create_stats_file():
+    if not os.path.exists(stats_file):
+        stats = {}
+        for trader in copytraders:
+            stats[trader['bbUser']] = {
+                'followers': 0,
+                'stability': 0,
+                'roi30j': 0,
+                'aum': 0
+            }
+        with open(stats_file, 'w') as f:
+            json.dump(stats, f, indent=4)
+    else:
+        with open(stats_file, 'r') as f:
+            stats = json.load(f)
+        
+        # Usunięcie użytkowników z pliku stats.json, którzy nie są na liście copytraders
+        users_to_remove = [user for user in stats if user not in [trader['bbUser'] for trader in copytraders]]
+        for user in users_to_remove:
+            del stats[user]
+
+        with open(stats_file, 'w') as f:
+            json.dump(stats, f, indent=4)
+
+check_or_create_stats_file()
 
 @bot.event
 async def on_ready():
@@ -44,14 +84,13 @@ async def on_ready():
 
 @bot.command()
 async def check_traders(ctx):
-
     global channelId
     if ctx.channel.id != channelId:
         print('From not authorized channel')
         return
 
     timestamp = int(time.time() * 1000)
-    embed = discord.Embed(title="Copy Traders Information", color=discord.Color(int("2b2d31", 16)))
+    embed = discord.Embed(title="╔═══════════( Copy Traders Information )═══════════╗", color=discord.Color(int("2b2d31", 16)))
 
     traders_info = []
     message = await ctx.send("Please wait, I am getting the data...")
@@ -70,15 +109,36 @@ async def check_traders(ctx):
                 roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
                 aum = int(json_data['result']['aumE8']) / 100000000
 
+                with open(stats_file, 'r') as f:
+                    stats = json.load(f)
+                    if infos['bbUser'] in stats:
+                        prev_values = stats[infos['bbUser']]
+                        follower_arrow = get_arrow(followers, prev_values['followers'])
+                        stability_arrow = get_arrow(stability, prev_values['stability'])
+                        roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
+                        aum_arrow = get_arrow(aum, prev_values['aum'])
+                    else:
+                        follower_arrow = stability_arrow = roi_arrow = aum_arrow = ""
+
                 fire_emoji = "🔥" if roi30j > 20 else ""
-                
+
                 trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
-                                f"ROI (30 days): {roi30j}% {fire_emoji}\n" \
-                                f"Followers: {followers}\n" \
-                                f"AUM: {aum} USDT\n" \
-                                f"Stability: {stability}"
+                              f"ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
+                              f"Followers: **{followers}** {follower_arrow}\n" \
+                              f"AUM: **{aum} USDT** {aum_arrow}\n" \
+                              f"Stability: **{stability}** {stability_arrow}"
 
                 traders_info.append((roi30j, trader_info))
+
+                stats[infos['bbUser']] = {
+                    'followers': followers,
+                    'stability': stability,
+                    'roi30j': roi30j,
+                    'aum': aum
+                }
+
+                with open(stats_file, 'w') as f:
+                    json.dump(stats, f, indent=4)
 
             except Exception as e:
                 print(f"An error occurred: {e}")
@@ -89,18 +149,6 @@ async def check_traders(ctx):
 
     for i, (roi, trader_info) in enumerate(traders_info, start=1):
         embed.add_field(name=f"", value=trader_info, inline=True)
-    await message.edit(content="", embed=embed)  # Edytowanie nowej wiadomości
-
-
-async def cronFunction():
-    global channelId
-    channel = bot.get_channel(channelId)
-    
-    await check_traders(channel)
-
-
-scheduler = AsyncIOScheduler()
-scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
-scheduler.start()
+    await message.edit(content="", embed=embed)
 
 bot.run(discordBotId)
