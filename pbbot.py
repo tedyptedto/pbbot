@@ -38,16 +38,17 @@ channelId = int(open(base_dir+"/config/channel_id.txt", 'r').read())
 discordBotId = open(base_dir+"/config/token.txt", 'r').read()
 
 intents = discord.Intents.default()
-intents.message_content = True
+if not getattr(intents, 'message_content', False):
+    intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 copytraders = [
-    {'bbUser': 'xaocarlo', 'bbCode': "JKuwFA2ebE%2BUhjKrItsMbA%3D%3D"},
-    {'bbUser': 'luantesting', 'bbCode': "y3R6ru2Yv6mVK3t7bebfJQ%3D%3D"},
-    {'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D"},
-    {'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D"},
-    {'bbUser': 'tedyptedtoCpTr', 'bbCode': "VAfEwFPZdNdfYGWiwy7V0g%3D%3D"},
+    {'discordUser': 'xaocarlo', 'bbUser': 'xaocarlo', 'bbCode': "JKuwFA2ebE%2BUhjKrItsMbA%3D%3D"},
+    {'discordUser': 'LuaN', 'bbUser': 'luantesting', 'bbCode': "y3R6ru2Yv6mVK3t7bebfJQ%3D%3D"},
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D"},
+    {'discordUser': 'mani', 'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D"},
+    {'discordUser': 'tedyptedto', 'bbUser': 'tedyptedtoCpTr', 'bbCode': "VAfEwFPZdNdfYGWiwy7V0g%3D%3D"},
 ]
 
 stats_file = base_dir + "/config/stats.json"
