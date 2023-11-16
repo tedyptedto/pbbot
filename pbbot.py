@@ -151,4 +151,15 @@ async def check_traders(ctx):
         embed.add_field(name=f"", value=trader_info, inline=True)
     await message.edit(content="", embed=embed)
 
+async def cronFunction():
+    global channelId
+    channel = bot.get_channel(channelId)
+
+    await check_traders(channel)
+
+
+scheduler = AsyncIOScheduler()
+scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
+scheduler.start()
+
 bot.run(discordBotId)
