@@ -84,11 +84,12 @@ async def on_ready():
     print(f'Logged in as {bot.user.name}')
 
 @bot.command()
-async def check_traders(ctx):
+async def check_traders(ctx, fromTask=False):
     global channelId
-    if ctx.channel.id != channelId:
-        print('From not authorized channel')
-        return
+    if not fromTask:
+        if ctx.channel.id != channelId:
+            print('From not authorized channel')
+            return
 
     timestamp = int(time.time() * 1000)
     embed = discord.Embed(title="╔═══════════( Copy Traders Information )═══════════╗", color=discord.Color(int("2b2d31", 16)))
@@ -156,11 +157,13 @@ async def cronFunction():
     global channelId
     channel = bot.get_channel(channelId)
 
-    await check_traders(channel)
+    await check_traders(channel, fromTask=True)
 
 
 scheduler = AsyncIOScheduler()
 scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
+# scheduler.add_job(cronFunction, 'interval', seconds=5)
+
 scheduler.start()
 
 bot.run(discordBotId)
