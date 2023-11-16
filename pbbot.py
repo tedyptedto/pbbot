@@ -145,7 +145,7 @@ async def check_traders(ctx, fromTask=False):
             except Exception as e:
                 print(f"An error occurred: {e}")
 
-    traders_info.sort(reverse=True, key=lambda x: x[0])
+    traders_info.sort(reverse=True, key=lambda x: (x[1].split('Stability: **')[1].split('**')[0], x[0]))
 
     embed.description = "\u200b"
 
@@ -161,8 +161,8 @@ async def cronFunction():
 
 
 scheduler = AsyncIOScheduler()
-scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
-# scheduler.add_job(cronFunction, 'interval', seconds=5)
+# scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
+scheduler.add_job(cronFunction, 'interval', seconds=5)
 
 scheduler.start()
 
