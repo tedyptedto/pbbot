@@ -1,6 +1,6 @@
 # pip install apscheduler
 # pip install discord
-# pip install httpx[http2]
+# pip install httpx[http2]
 # https://github.com/Rapptz/discord.py
 # créer le bot : https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token
 #
@@ -92,7 +92,7 @@ async def check_traders(ctx, fromTask=False):
             return
 
     timestamp = int(time.time() * 1000)
-    embed = discord.Embed(title="╔═══════════( Copy Traders Information )═══════════╗", color=discord.Color(int("2b2d31", 16)))
+    embed = discord.Embed(title='╔═══════════( Copy Traders Information )═══════════╗', color=discord.Color(int("2b2d31", 16)))
 
     traders_info = []
     message = await ctx.send("Please wait, I am getting the data...")
@@ -125,10 +125,10 @@ async def check_traders(ctx, fromTask=False):
                 fire_emoji = "🔥" if roi30j > 20 else ""
 
                 trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
-                              f"ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
-                              f"Followers: **{followers}** {follower_arrow}\n" \
-                              f"AUM: **{aum} USDT** {aum_arrow}\n" \
-                              f"Stability: **{stability}** {stability_arrow}"
+                              f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
+                              f"👤 Followers: **{followers}** {follower_arrow}\n" \
+                              f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
+                              f"⚖️ Stability: **{stability}** {stability_arrow}"
 
                 traders_info.append((roi30j, trader_info))
 
@@ -150,8 +150,16 @@ async def check_traders(ctx, fromTask=False):
     embed.description = "\u200b"
 
     for i, (roi, trader_info) in enumerate(traders_info, start=1):
-        embed.add_field(name=f"", value=trader_info, inline=True)
+        embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
     await message.edit(content="", embed=embed)
+
+def format_aum(aum):
+    if aum >= 1000000:
+        return f"{aum / 1000000:.2f}M"
+    elif aum >= 1000:
+        return f"{aum / 1000:.2f}k"
+    else:
+        return f"{aum:.2f}"
 
 async def cronFunction():
     global channelId
