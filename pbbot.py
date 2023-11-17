@@ -161,8 +161,8 @@ async def cronFunction():
 
 
 scheduler = AsyncIOScheduler()
-# scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
-scheduler.add_job(cronFunction, 'interval', seconds=5)
+scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
+# scheduler.add_job(cronFunction, 'interval', seconds=5)
 
 scheduler.start()
 
