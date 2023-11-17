@@ -79,9 +79,46 @@ def check_or_create_stats_file():
 
 check_or_create_stats_file()
 
+async def getUserLeaderBoard(username):
+    async with httpx.AsyncClient(http2=True) as session:
+        timestamp = int(time.time() * 1000)
+        url = f"https://api2.bybit.com/fapi/beehive/private/v1/common/recommend-leaders?timeStamp={timestamp}&language=en"
+        HEADERS = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
+            }
+        try:
+            response = await session.get("https://www.bybit.com/copyTrade/", headers=HEADERS) # Needed to get the cookies
+            response = await session.get(url, headers=HEADERS)
+            # print(url)
+            json_data = json.loads(response.text)
+            for leaderRecommendInfoList in json_data['result']['leaderRecommendInfoList']:
+                title = leaderRecommendInfoList['title']
+                for position, users in enumerate(leaderRecommendInfoList['leaderRecommendDetailList']):
+                    user = users['nickName']
+                    if (user == username):
+                        return {
+                            "user": username,
+                            "leadbordtype": title,
+                            "position" : position +1, 
+                        }
+
+            # print(json.dumps(json_data, indent=4))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+        return {
+                            "user": username,
+                            "leadbordtype": "",
+                            "position" : "", 
+                        }
+
+
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
+    print(await getUserLeaderBoard("tedyptedtoCpTr"))
+    print(await getUserLeaderBoard("manicptlowrisk"))
+    print(await getUserLeaderBoard("manicptrndr"))
 
 @bot.command()
 async def check_traders(ctx, fromTask=False):
