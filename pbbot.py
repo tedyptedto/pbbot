@@ -54,6 +54,7 @@ copytraders = [
 stats_file = base_dir + "/config/stats.json"
 last_check_time = 0
 cooldown = 10
+cache_leaderboard = ""
 
 def check_or_create_stats_file():
     if not os.path.exists(stats_file):
@@ -82,6 +83,7 @@ def check_or_create_stats_file():
 check_or_create_stats_file()
 
 async def getUserLeaderBoard(username):
+    global cache_leaderboard
     async with httpx.AsyncClient(http2=True) as session:
         timestamp = int(time.time() * 1000)
         url = f"https://api2.bybit.com/fapi/beehive/private/v1/common/recommend-leaders?timeStamp={timestamp}&language=en"
@@ -89,10 +91,12 @@ async def getUserLeaderBoard(username):
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
             }
         try:
-            response = await session.get("https://www.bybit.com/copyTrade/", headers=HEADERS) # Needed to get the cookies
-            response = await session.get(url, headers=HEADERS)
+            if cache_leaderboard == "":
+                response = await session.get("https://www.bybit.com/copyTrade/", headers=HEADERS) # Needed to get the cookies
+                response = await session.get(url, headers=HEADERS)
+                cache_leaderboard = response.text 
             # print(url)
-            json_data = json.loads(response.text)
+            json_data = json.loads(cache_leaderboard)
             for leaderRecommendInfoList in json_data['result']['leaderRecommendInfoList']:
                 title = leaderRecommendInfoList['title']
                 for position, users in enumerate(leaderRecommendInfoList['leaderRecommendDetailList']):
@@ -118,14 +122,13 @@ async def getUserLeaderBoard(username):
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
-    print(await getUserLeaderBoard("tedyptedtoCpTr"))
-    print(await getUserLeaderBoard("manicptlowrisk"))
-    print(await getUserLeaderBoard("manicptrndr"))
 
 @bot.command()
 async def check_traders(ctx, fromTask=False):
     global channelId
     global last_check_time
+    global cache_leaderboard
+    cache_leaderboard = ""
     current_time = time.time()
     if current_time - last_check_time >= cooldown:
         last_check_time = current_time
@@ -167,12 +170,18 @@ async def check_traders(ctx, fromTask=False):
 
                     fire_emoji = "🔥" if roi30j > 20 else ""
 
+                    leaderboard = (await getUserLeaderBoard(infos['bbUser']))
+
+                    if (leaderboard['position'] != ""):
+                        leaderboard['position'] = str(leaderboard['position']) + "°"
+
                     trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
                                 f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
-                                f"⚖️ Stability: **{stability}** {stability_arrow}"
-
+                                f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
+                                f"**{leaderboard['position']} {leaderboard['leadbordtype']}**\n" \
+                                f""
                     traders_info.append((roi30j, trader_info))
 
                     stats[infos['bbUser']] = {
