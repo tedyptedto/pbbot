@@ -20,19 +20,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.background import BackgroundScheduler
 
-def get_arrow(current, previous):
-    try:
-        current = str(current)
-        previous = str(previous)
-        if current > previous:
-            return " | **↗**"
-        elif current < previous:
-            return " | **↘**"
-        else:
-            return ""
-    except ValueError:
-        return "❌"
-
 base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/')+'/'
 channelId = int(open(base_dir+"/config/channel_id.txt", 'r').read())
 discordBotId = open(base_dir+"/config/token.txt", 'r').read()
@@ -71,8 +58,6 @@ def check_or_create_stats_file():
     else:
         with open(stats_file, 'r') as f:
             stats = json.load(f)
-        
-        # Usunięcie użytkowników z pliku stats.json, którzy nie są na liście copytraders
         users_to_remove = [user for user in stats if user not in [trader['bbUser'] for trader in copytraders]]
         for user in users_to_remove:
             del stats[user]
@@ -123,95 +108,112 @@ async def getUserLeaderBoard(username):
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
 
+@commands.cooldown(1, 2, commands.BucketType.user)
 @bot.command()
 async def check_traders(ctx, fromTask=False):
     global channelId
     global last_check_time
     global cache_leaderboard
     cache_leaderboard = ""
-    current_time = time.time()
-    if current_time - last_check_time >= cooldown:
-        last_check_time = current_time
-        if not fromTask:
-            if ctx.channel.id != channelId:
-                print('From not authorized channel')
-                return
+    if not fromTask:
+        if ctx.channel.id != channelId:
+            print('From not authorized channel')
+            return
 
-        timestamp = int(time.time() * 1000)
-        embed = discord.Embed(title='╔═══════════( Copy Traders Information )═══════════╗', color=discord.Color(int("2b2d31", 16)))
+    timestamp = int(time.time() * 1000)
+    embed = discord.Embed(title='╔═══════════( Copy Traders Information )═══════════╗', color=discord.Color(int("2b2d31", 16)))
 
-        traders_info = []
-        message = await ctx.send("Please wait, I am getting the data...")
-        async with httpx.AsyncClient(http2=True) as session:
-            for infos in copytraders:
-                url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
-                HEADERS = {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
+    traders_info = []
+    message = await ctx.send("Please wait, I am getting the data...")
+    async with httpx.AsyncClient(http2=True) as session:
+        for infos in copytraders:
+            url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
+            HEADERS = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
+            }
+
+            try:
+                response = await session.get(url, headers=HEADERS) 
+                json_data = json.loads(response.text)
+                followers = json_data['result']['currentFollowerCount']
+                stability = json_data['result']['stableScoreLevelFormat']
+                roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
+                aum = int(json_data['result']['aumE8']) / 100000000
+
+                with open(stats_file, 'r') as f:
+                    stats = json.load(f)
+                    if infos['bbUser'] in stats:
+                        prev_values = stats[infos['bbUser']]
+                        follower_arrow = get_arrow(followers, prev_values['followers'])
+                        stability_arrow = get_arrow(stability, prev_values['stability'])
+                        roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
+                        aum_arrow = get_arrow(aum, prev_values['aum'])
+                    else:
+                        follower_arrow = stability_arrow = roi_arrow = aum_arrow = ""
+
+                fire_emoji = "🔥" if roi30j > 20 else ""
+
+                leaderboard = (await getUserLeaderBoard(infos['bbUser']))
+
+                if (leaderboard['position'] != ""):
+                    leaderboard['position'] = str(leaderboard['position']) + "°"
+
+                leaderboardtext = f"🏆 Leaderboard: ╗\n**{leaderboard['position']} {leaderboard['leadbordtype']}**" if leaderboard['position'] else ""
+
+                trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
+                            f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
+                            f"👤 Followers: **{followers}** {follower_arrow}\n" \
+                            f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
+                            f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
+                            f"{leaderboardtext}\n" \
+                            f""
+                traders_info.append((roi30j, trader_info))
+
+                stats[infos['bbUser']] = {
+                    'followers': followers,
+                    'stability': stability,
+                    'roi30j': roi30j,
+                    'aum': aum
                 }
 
-                try:
-                    response = await session.get(url, headers=HEADERS) 
-                    json_data = json.loads(response.text)
-                    followers = json_data['result']['currentFollowerCount']
-                    stability = json_data['result']['stableScoreLevelFormat']
-                    roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
-                    aum = int(json_data['result']['aumE8']) / 100000000
+                with open(stats_file, 'w') as f:
+                    json.dump(stats, f, indent=4)
 
-                    with open(stats_file, 'r') as f:
-                        stats = json.load(f)
-                        if infos['bbUser'] in stats:
-                            prev_values = stats[infos['bbUser']]
-                            follower_arrow = get_arrow(followers, prev_values['followers'])
-                            stability_arrow = get_arrow(stability, prev_values['stability'])
-                            roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
-                            aum_arrow = get_arrow(aum, prev_values['aum'])
-                        else:
-                            follower_arrow = stability_arrow = roi_arrow = aum_arrow = ""
+            except Exception as e:
+                print(f"An error occurred: {e}")
 
-                    fire_emoji = "🔥" if roi30j > 20 else ""
+    traders_info.sort(reverse=True, key=lambda x: (x[1].split('Stability: **')[1].split('**')[0], x[0]))
 
-                    leaderboard = (await getUserLeaderBoard(infos['bbUser']))
+    embed.description = "\u200b"
 
-                    if (leaderboard['position'] != ""):
-                        leaderboard['position'] = str(leaderboard['position']) + "°"
+    for i, (roi, trader_info) in enumerate(traders_info, start=1):
+        embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
+    await message.edit(content="", embed=embed)
 
-                    trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
-                                f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
-                                f"👤 Followers: **{followers}** {follower_arrow}\n" \
-                                f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
-                                f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
-                                f"**{leaderboard['position']} {leaderboard['leadbordtype']}**\n" \
-                                f""
-                    traders_info.append((roi30j, trader_info))
 
-                    stats[infos['bbUser']] = {
-                        'followers': followers,
-                        'stability': stability,
-                        'roi30j': roi30j,
-                        'aum': aum
-                    }
 
-                    with open(stats_file, 'w') as f:
-                        json.dump(stats, f, indent=4)
-
-                except Exception as e:
-                    print(f"An error occurred: {e}")
-
-        traders_info.sort(reverse=True, key=lambda x: (x[1].split('Stability: **')[1].split('**')[0], x[0]))
-
-        embed.description = "\u200b"
-
-        for i, (roi, trader_info) in enumerate(traders_info, start=1):
-            embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
-        await message.edit(content="", embed=embed)
-    else:
-        remaining_time = cooldown - (current_time - last_check_time)
-        response = await ctx.send(f"Wait {remaining_time:.0f} seconds before using the command", reference=ctx.message)
-        await asyncio.sleep(3)
+@check_traders.error
+async def check_traders_error(ctx, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        response = await ctx.send(f"Wait {error.retry_after:.0f} seconds before using the command", reference=ctx.message)
+        await asyncio.sleep(4)
         await response.delete()
-        await asyncio.sleep(1)
         await ctx.message.delete()
+    else:
+        await ctx.send("An error occurred while executing the command.")
 
+def get_arrow(current, previous):
+    try:
+        current = str(current)
+        previous = str(previous)
+        if current > previous:
+            return " | **↗**"
+        elif current < previous:
+            return " | **↘**"
+        else:
+            return ""
+    except ValueError:
+        return "❌"
 
 def format_aum(aum):
     if aum >= 1000000:
