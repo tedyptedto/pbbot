@@ -39,6 +39,7 @@ copytraders = [
     {'discordUser': 'tedyptedto', 'bbUser': 'tedySub2', 'bbCode': "W86y5Bo8c78Cy803QgMwMg%3D%3D"},
     {'discordUser': 'tedyptedto', 'bbUser': 'Tedy57123TheBestOne', 'bbCode': "K%2Bupto5fn8zpUpIY0GvI%2FA%3D%3D"},
     {'discordUser': 'jnk_xnxx', 'bbUser': 'jnk777', 'bbCode': "1o7jD8RX7meCMGaqG2tE3w%3D%3D"},
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk2', 'bbCode': "jGPes4W1lsptyz6Lxmwkxg%3D%3D"},
 ]
 
 stats_file = base_dir + "/config/stats.json"
