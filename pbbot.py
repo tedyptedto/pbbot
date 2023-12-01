@@ -172,7 +172,7 @@ async def check_traders(ctx, fromTask=False):
                     leaderboardtext += f"🏆 **{leaderboard['position']} {leaderboard['leadbordtype']}**\n" if leaderboard['position'] else f"\n"
 
                 trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
-                            f"{nbdays} Days\n" \
+                            f"Days **{nbdays}**\n" \
                             f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
                             f"👤 Followers: **{followers}** {follower_arrow}\n" \
                             f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
