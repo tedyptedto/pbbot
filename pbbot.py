@@ -79,6 +79,9 @@ async def getUserLeaderBoard(username):
         HEADERS = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
             }
+        
+        aInfos = []
+
         try:
             if cache_leaderboard == "":
                 response = await session.get("https://www.bybit.com/copyTrade/", headers=HEADERS) # Needed to get the cookies
@@ -91,22 +94,18 @@ async def getUserLeaderBoard(username):
                 for position, users in enumerate(leaderRecommendInfoList['leaderRecommendDetailList']):
                     user = users['nickName']
                     if (user == username):
-                        return {
+                        aInfos.append({
                             "user": username,
                             "leadbordtype": title,
                             "position" : position +1, 
-                        }
+                        })
 
             # print(json.dumps(json_data, indent=4))
         except Exception as e:
             print(f"An error occurred: {e}")
 
-        return {
-                            "user": username,
-                            "leadbordtype": "",
-                            "position" : "", 
-                        }
 
+        return aInfos
 
 @bot.event
 async def on_ready():
@@ -132,17 +131,24 @@ async def check_traders(ctx, fromTask=False):
     async with httpx.AsyncClient(http2=True) as session:
         for infos in copytraders:
             url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
+            urlInfo = f"https://api2.bybit.com/fapi/beehive/private/v1/pub-leader/info?timeStamp={timestamp}&language=en&leaderMark={infos['bbCode']}"
+            
             HEADERS = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
             }
 
             try:
                 response = await session.get(url, headers=HEADERS) 
+                infosUser = await session.get(urlInfo, headers=HEADERS) 
+                # print(urlInfo)
+                # print(infosUser.text)
+                infosUser = json.loads(infosUser.text) 
                 json_data = json.loads(response.text)
                 followers = json_data['result']['currentFollowerCount']
                 stability = json_data['result']['stableScoreLevelFormat']
                 roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
                 aum = int(json_data['result']['aumE8']) / 100000000
+                nbdays = int(infosUser['result']['tradeDays'])
 
                 with open(stats_file, 'r') as f:
                     stats = json.load(f)
@@ -157,19 +163,21 @@ async def check_traders(ctx, fromTask=False):
 
                 fire_emoji = "🔥" if roi30j > 20 else ""
 
-                leaderboard = (await getUserLeaderBoard(infos['bbUser']))
+                aLeaderboard = (await getUserLeaderBoard(infos['bbUser']))
 
-                if (leaderboard['position'] != ""):
+
+                leaderboardtext = ""
+                for leaderboard in aLeaderboard:
                     leaderboard['position'] = str(leaderboard['position']) + "°"
-
-                leaderboardtext = f"🏆 Leaderboard: ╗\n**{leaderboard['position']} {leaderboard['leadbordtype']}**" if leaderboard['position'] else ""
+                    leaderboardtext += f"🏆 **{leaderboard['position']} {leaderboard['leadbordtype']}**\n" if leaderboard['position'] else f"\n"
 
                 trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
+                            f"{nbdays} Days\n" \
                             f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
                             f"👤 Followers: **{followers}** {follower_arrow}\n" \
                             f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
                             f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
-                            f"{leaderboardtext}\n" \
+                            f"{leaderboardtext}" \
                             f""
                 traders_info.append((roi30j, trader_info))
 
