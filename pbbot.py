@@ -43,6 +43,8 @@ copytraders = [
     
     {'discordUser': 'Hawkeye', 'bbUser': 'Hawkbot OB', 'bbCode': "V4HRLaBjCXQoSmjpACIggg%3D%3D"},
     {'discordUser': 'Hawkeye', 'bbUser': 'Hawkbot scalper', 'bbCode': "3U0%2BHYawCwEVdm12DBs5cA%3D%3D"},
+
+    {'discordUser': 'LuaN', 'bbUser': 'luanmain', 'bbCode': "XqusunZ9%2FNPX5IMAdmHvKg%3D%3D"},
 ]
 
 stats_file = base_dir + "/config/stats.json"
