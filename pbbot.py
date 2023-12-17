@@ -41,10 +41,11 @@ copytraders = [
     {'discordUser': 'jnk_xnxx', 'bbUser': 'jnk777', 'bbCode': "1o7jD8RX7meCMGaqG2tE3w%3D%3D"},
     {'discordUser': 'mani', 'bbUser': 'manicptlowrisk2', 'bbCode': "jGPes4W1lsptyz6Lxmwkxg%3D%3D"},
     
-    {'discordUser': 'Hawkeye', 'bbUser': 'Hawkbot OB', 'bbCode': "V4HRLaBjCXQoSmjpACIggg%3D%3D"},
     {'discordUser': 'Hawkeye', 'bbUser': 'Hawkbot scalper', 'bbCode': "3U0%2BHYawCwEVdm12DBs5cA%3D%3D"},
 
     {'discordUser': 'LuaN', 'bbUser': 'luanmain', 'bbCode': "XqusunZ9%2FNPX5IMAdmHvKg%3D%3D"},
+
+    {'discordUser': 'iamtheonewhoknocks', 'bbUser': 'IamtheonewhoKnocks', 'bbCode': "b5ChnV8%2BGglQIpaZEA29ug%3D%3D"},
 ]
 
 stats_file = base_dir + "/config/stats.json"
