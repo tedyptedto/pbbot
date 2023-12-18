@@ -32,6 +32,8 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 copytraders = [
     {'discordUser': 'xaocarlo', 'bbUser': 'xaocarlo', 'bbCode': "JKuwFA2ebE%2BUhjKrItsMbA%3D%3D"},
+    {'discordUser': 'xaocarlo', 'bbUser': 'RUCapital07', 'bbCode': "WdGj1QiU4kv1FoLP6%2FTLqg%3D%3D"},
+
     {'discordUser': 'LuaN', 'bbUser': 'luantesting', 'bbCode': "y3R6ru2Yv6mVK3t7bebfJQ%3D%3D"},
     {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D"},
     {'discordUser': 'mani', 'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D"},
