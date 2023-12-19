@@ -56,7 +56,7 @@ copytraders = [
     # BYBIT #
 
     # BINANCE #
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "3746904129636329728", 'exchange': "binance"}
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk⠀', 'bbCode': "3746904129636329728", 'exchange': "binance"}
     # BINANCE #
 ]
 
@@ -69,12 +69,21 @@ def check_or_create_stats_file():
     if not os.path.exists(stats_file):
         stats = {}
         for trader in copytraders:
-            stats[trader['bbUser']] = {
-                'followers': 0,
-                'stability': 0,
-                'roi30j': 0,
-                'aum': 0
-            }
+            if trader['exchange'] == "bybit":
+                stats[trader['bbUser']] = {
+                    'followers': 0,
+                    'stability': 0,
+                    'roi30j': 0,
+                    'aum': 0,
+                    'exchange': "bybit"
+                }
+            if trader['exchange'] == "binance":
+                stats[trader['bbUser']] = {
+                    'followers': 0,
+                    'roi30j': 0,
+                    'aum': 0,
+                    'exchange': "binance"
+                }
         with open(stats_file, 'w') as f:
             json.dump(stats, f, indent=4)
     else:
@@ -203,7 +212,8 @@ async def check_traders(ctx, fromTask=False):
                         'followers': followers,
                         'stability': stability,
                         'roi30j': roi30j,
-                        'aum': aum
+                        'aum': aum,
+                        'exchange': "bybit"
                     }
 
                     with open(stats_file, 'w') as f:
@@ -228,17 +238,39 @@ async def check_traders(ctx, fromTask=False):
                     json_data = json.loads(response.text)
                     followers = json_data['data']['currentCopyCount']
                     #stability = json_data['result']['stableScoreLevelFormat']
-                    roi30j = float(infosUser['data']['roi'])
-                    aum = float(json_data['data']['aumAmount'])
+                    roi30j = round(float(infosUser['data']['roi']), 2)
+                    aum = round(float(json_data['data']['aumAmount']), 2)
                     #nbdays = int(infosUser['result']['tradeDays'])
+
+
+                    with open(stats_file, 'r') as f:
+                        stats = json.load(f)
+                        if infos['bbUser'] in stats:
+                            prev_values = stats[infos['bbUser']]
+                            follower_arrow = get_arrow(followers, prev_values['followers'])
+                            roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
+                            aum_arrow = get_arrow(aum, prev_values['aum'])
+                        else:
+                            follower_arrow = roi_arrow = aum_arrow = ""
+
+
                     trader_info2 = f"**[{infos['bbUser']}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
-                                f"🎯 ROI (30D): **{roi30j:.2f}%**\n" \
-                                f"👤 Followers: **{followers}**\n" \
-                                f"💰 AUM: **{format_aum(aum)}$**\n" \
+                                f"🎯 ROI (30D): **{roi30j:.2f}%** {fire_emoji} {roi_arrow}\n" \
+                                f"👤 Followers: **{followers}** {follower_arrow}\n" \
+                                f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
                                 f""
                     traders_info2.append((40, trader_info2))
 
 
+                    stats[infos['bbUser']] = {
+                        'followers': followers,
+                        'roi30j': roi30j,
+                        'aum': aum,
+                        'exchange': "binance"
+                    }
+
+                    with open(stats_file, 'w') as f:
+                        json.dump(stats, f, indent=4)
 
                 except Exception as e:
                     print(f"An error occurred: {e}")
