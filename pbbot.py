@@ -53,6 +53,8 @@ copytraders = [
     {'discordUser': 'Hawkeye', 'bbUser': 'Hawkbot scalper', 'bbCode': "3U0%2BHYawCwEVdm12DBs5cA%3D%3D", 'exchange': "bybit"},
 
     {'discordUser': 'iamtheonewhoknocks', 'bbUser': 'IamtheonewhoKnocks', 'bbCode': "b5ChnV8%2BGglQIpaZEA29ug%3D%3D", 'exchange': "bybit"},
+    
+    {'discordUser': 'wibra', 'bbUser': 'wibra', 'bbCode': "OlUuAokgYu%2FFZY2WKQgn7Q%3D%3D%20", 'exchange': "bybit"},
     # BYBIT #
 
     # BINANCE #
