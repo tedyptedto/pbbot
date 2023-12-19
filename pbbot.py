@@ -275,8 +275,9 @@ async def check_traders(ctx, fromTask=False):
                 except Exception as e:
                     print(f"An error occurred: {e}")
 
-
         traders_info.sort(reverse=True, key=lambda x: (x[1].split('Stability: **')[1].split('**')[0], x[0]))
+        traders_info2.sort(reverse=True, key=lambda x: (float(x[1].split('ROI (30D): **')[1].split('%')[0]), x[0]))
+
         embed.description = "\u200b"
         for i, (roi, trader_info) in enumerate(traders_info, start=1):
             embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
