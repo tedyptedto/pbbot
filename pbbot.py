@@ -55,6 +55,7 @@ copytraders = [
     {'discordUser': 'iamtheonewhoknocks', 'bbUser': 'IamtheonewhoKnocks', 'bbCode': "b5ChnV8%2BGglQIpaZEA29ug%3D%3D", 'exchange': "bybit"},
     
     {'discordUser': 'wibra', 'bbUser': 'wibra', 'bbCode': "OlUuAokgYu%2FFZY2WKQgn7Q%3D%3D", 'exchange': "bybit"},
+    
     # BYBIT #
 
     # BINANCE #
@@ -156,7 +157,7 @@ async def check_traders(ctx, fromTask=False):
 
     traders_info = []
     traders_info2 = []
-    message = await ctx.send("Please wait, I am getting the data...", reference=ctx.message)
+    message = await ctx.send("https://i.imgur.com/c4AGtzM.gif", reference=ctx.message)
     async with httpx.AsyncClient(http2=True) as session:
         embed = discord.Embed(title='╔═════════════( Copy Traders BYBIT )═════════════╗', color=discord.Color(int("2b2d31", 16)))
         for infos in copytraders:
@@ -190,7 +191,7 @@ async def check_traders(ctx, fromTask=False):
                         else:
                             follower_arrow = stability_arrow = roi_arrow = aum_arrow = ""
 
-                    fire_emoji = "🔥" if roi30j > 20 else ""
+                    fire_emoji = "🔥" if roi30j >= 20.00 else ""
 
                     aLeaderboard = (await getUserLeaderBoard(infos['bbUser']))
 
@@ -255,6 +256,7 @@ async def check_traders(ctx, fromTask=False):
                         else:
                             follower_arrow = roi_arrow = aum_arrow = ""
 
+                    fire_emoji = "🔥" if roi30j >= 20.00 else ""
 
                     trader_info2 = f"**[{infos['bbUser']}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
                                 f"🎯 ROI (30D): **{roi30j:.2f}%** {fire_emoji} {roi_arrow}\n" \
