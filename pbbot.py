@@ -31,24 +31,33 @@ if not getattr(intents, 'message_content', True):
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 copytraders = [
-    {'discordUser': 'xaocarlo', 'bbUser': 'xaocarlo', 'bbCode': "JKuwFA2ebE%2BUhjKrItsMbA%3D%3D"},
-    {'discordUser': 'xaocarlo', 'bbUser': 'RUCapital07', 'bbCode': "WdGj1QiU4kv1FoLP6%2FTLqg%3D%3D"},
 
-    {'discordUser': 'LuaN', 'bbUser': 'luantesting', 'bbCode': "y3R6ru2Yv6mVK3t7bebfJQ%3D%3D"},
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D"},
-    {'discordUser': 'mani', 'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D"},
-    {'discordUser': 'tedyptedto', 'bbUser': 'tedyptedtoCpTr', 'bbCode': "VAfEwFPZdNdfYGWiwy7V0g%3D%3D"},
-    {'discordUser': 'tedyptedto', 'bbUser': 'tedySub2', 'bbCode': "W86y5Bo8c78Cy803QgMwMg%3D%3D"},
-    {'discordUser': 'tedyptedto', 'bbUser': 'Tedy57123TheBestOne', 'bbCode': "K%2Bupto5fn8zpUpIY0GvI%2FA%3D%3D"},
-    {'discordUser': 'jnk_xnxx', 'bbUser': 'jnk777', 'bbCode': "1o7jD8RX7meCMGaqG2tE3w%3D%3D"},
-    {'discordUser': 'jnk_xnxx', 'bbUser': 'jnkmone', 'bbCode': "I7eQ24u71qN5fYJ%2BbnXXlQ%3D%3D"},
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk2', 'bbCode': "jGPes4W1lsptyz6Lxmwkxg%3D%3D"},
+    # BYBIT
+    {'discordUser': 'xaocarlo', 'bbUser': 'xaocarlo', 'bbCode': "JKuwFA2ebE%2BUhjKrItsMbA%3D%3D", 'exchange': "bybit"},
+    {'discordUser': 'xaocarlo', 'bbUser': 'RUCapital07', 'bbCode': "WdGj1QiU4kv1FoLP6%2FTLqg%3D%3D", 'exchange': "bybit"},
+
+    {'discordUser': 'LuaN', 'bbUser': 'luantesting', 'bbCode': "y3R6ru2Yv6mVK3t7bebfJQ%3D%3D", 'exchange': "bybit"},
+    {'discordUser': 'LuaN', 'bbUser': 'luanmain', 'bbCode': "XqusunZ9%2FNPX5IMAdmHvKg%3D%3D", 'exchange': "bybit"},
+
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D", 'exchange': "bybit"},
+    {'discordUser': 'mani', 'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D", 'exchange': "bybit"},
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk2', 'bbCode': "jGPes4W1lsptyz6Lxmwkxg%3D%3D", 'exchange': "bybit"},
+
+    {'discordUser': 'tedyptedto', 'bbUser': 'tedyptedtoCpTr', 'bbCode': "VAfEwFPZdNdfYGWiwy7V0g%3D%3D", 'exchange': "bybit"},
+    {'discordUser': 'tedyptedto', 'bbUser': 'tedySub2', 'bbCode': "W86y5Bo8c78Cy803QgMwMg%3D%3D", 'exchange': "bybit"},
+    {'discordUser': 'tedyptedto', 'bbUser': 'Tedy57123TheBestOne', 'bbCode': "K%2Bupto5fn8zpUpIY0GvI%2FA%3D%3D", 'exchange': "bybit"},
+
+    {'discordUser': 'jnk_xnxx', 'bbUser': 'jnk777', 'bbCode': "1o7jD8RX7meCMGaqG2tE3w%3D%3D", 'exchange': "bybit"},
+    {'discordUser': 'jnk_xnxx', 'bbUser': 'jnkmone', 'bbCode': "I7eQ24u71qN5fYJ%2BbnXXlQ%3D%3D", 'exchange': "bybit"},
     
-    {'discordUser': 'Hawkeye', 'bbUser': 'Hawkbot scalper', 'bbCode': "3U0%2BHYawCwEVdm12DBs5cA%3D%3D"},
+    {'discordUser': 'Hawkeye', 'bbUser': 'Hawkbot scalper', 'bbCode': "3U0%2BHYawCwEVdm12DBs5cA%3D%3D", 'exchange': "bybit"},
 
-    {'discordUser': 'LuaN', 'bbUser': 'luanmain', 'bbCode': "XqusunZ9%2FNPX5IMAdmHvKg%3D%3D"},
+    {'discordUser': 'iamtheonewhoknocks', 'bbUser': 'IamtheonewhoKnocks', 'bbCode': "b5ChnV8%2BGglQIpaZEA29ug%3D%3D", 'exchange': "bybit"},
+    # BYBIT #
 
-    {'discordUser': 'iamtheonewhoknocks', 'bbUser': 'IamtheonewhoKnocks', 'bbCode': "b5ChnV8%2BGglQIpaZEA29ug%3D%3D"},
+    # BINANCE #
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "3746904129636329728", 'exchange': "binance"}
+    # BINANCE #
 ]
 
 stats_file = base_dir + "/config/stats.json"
@@ -133,83 +142,118 @@ async def check_traders(ctx, fromTask=False):
             return
 
     timestamp = int(time.time() * 1000)
-    embed = discord.Embed(title='╔═══════════( Copy Traders Information )═══════════╗', color=discord.Color(int("2b2d31", 16)))
 
     traders_info = []
-    message = await ctx.send("Please wait, I am getting the data...")
+    traders_info2 = []
+    message = await ctx.send("Please wait, I am getting the data...", reference=ctx.message)
     async with httpx.AsyncClient(http2=True) as session:
+        embed = discord.Embed(title='╔═════════════( Copy Traders BYBIT )═════════════╗', color=discord.Color(int("2b2d31", 16)))
         for infos in copytraders:
-            url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
-            urlInfo = f"https://api2.bybit.com/fapi/beehive/private/v1/pub-leader/info?timeStamp={timestamp}&language=en&leaderMark={infos['bbCode']}"
-            
-            HEADERS = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
+            if infos['exchange'] == "bybit":
+                url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
+                urlInfo = f"https://api2.bybit.com/fapi/beehive/private/v1/pub-leader/info?timeStamp={timestamp}&language=en&leaderMark={infos['bbCode']}"
+                HEADERS = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
             }
+                try:
+                    response = await session.get(url, headers=HEADERS) 
+                    infosUser = await session.get(urlInfo, headers=HEADERS) 
+                    # print(urlInfo)
+                    # print(infosUser.text)
+                    infosUser = json.loads(infosUser.text) 
+                    json_data = json.loads(response.text)
+                    followers = json_data['result']['currentFollowerCount']
+                    stability = json_data['result']['stableScoreLevelFormat']
+                    roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
+                    aum = int(json_data['result']['aumE8']) / 100000000
+                    nbdays = int(infosUser['result']['tradeDays'])
 
-            try:
-                response = await session.get(url, headers=HEADERS) 
-                infosUser = await session.get(urlInfo, headers=HEADERS) 
-                # print(urlInfo)
-                # print(infosUser.text)
-                infosUser = json.loads(infosUser.text) 
-                json_data = json.loads(response.text)
-                followers = json_data['result']['currentFollowerCount']
-                stability = json_data['result']['stableScoreLevelFormat']
-                roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
-                aum = int(json_data['result']['aumE8']) / 100000000
-                nbdays = int(infosUser['result']['tradeDays'])
+                    with open(stats_file, 'r') as f:
+                        stats = json.load(f)
+                        if infos['bbUser'] in stats:
+                            prev_values = stats[infos['bbUser']]
+                            follower_arrow = get_arrow(followers, prev_values['followers'])
+                            stability_arrow = get_arrow(stability, prev_values['stability'])
+                            roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
+                            aum_arrow = get_arrow(aum, prev_values['aum'])
+                        else:
+                            follower_arrow = stability_arrow = roi_arrow = aum_arrow = ""
 
-                with open(stats_file, 'r') as f:
-                    stats = json.load(f)
-                    if infos['bbUser'] in stats:
-                        prev_values = stats[infos['bbUser']]
-                        follower_arrow = get_arrow(followers, prev_values['followers'])
-                        stability_arrow = get_arrow(stability, prev_values['stability'])
-                        roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
-                        aum_arrow = get_arrow(aum, prev_values['aum'])
-                    else:
-                        follower_arrow = stability_arrow = roi_arrow = aum_arrow = ""
+                    fire_emoji = "🔥" if roi30j > 20 else ""
 
-                fire_emoji = "🔥" if roi30j > 20 else ""
-
-                aLeaderboard = (await getUserLeaderBoard(infos['bbUser']))
+                    aLeaderboard = (await getUserLeaderBoard(infos['bbUser']))
 
 
-                leaderboardtext = ""
-                for leaderboard in aLeaderboard:
-                    leaderboard['position'] = str(leaderboard['position']) + "°"
-                    leaderboardtext += f"🏆 **{leaderboard['position']} {leaderboard['leadbordtype']}**\n" if leaderboard['position'] else f"\n"
+                    leaderboardtext = ""
+                    for leaderboard in aLeaderboard:
+                        leaderboard['position'] = str(leaderboard['position']) + "°"
+                        leaderboardtext += f"🏆 **{leaderboard['position']} {leaderboard['leadbordtype']}**\n" if leaderboard['position'] else f"\n"
 
-                trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
-                            f"🗓️ **{nbdays}** Days\n" \
-                            f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
-                            f"👤 Followers: **{followers}** {follower_arrow}\n" \
-                            f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
-                            f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
-                            f"{leaderboardtext}" \
-                            f""
-                traders_info.append((roi30j, trader_info))
+                    trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
+                                f"🗓️ **{nbdays}** Days\n" \
+                                f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
+                                f"👤 Followers: **{followers}** {follower_arrow}\n" \
+                                f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
+                                f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
+                                f"{leaderboardtext}" \
+                                f""
+                    traders_info.append((roi30j, trader_info))
 
-                stats[infos['bbUser']] = {
-                    'followers': followers,
-                    'stability': stability,
-                    'roi30j': roi30j,
-                    'aum': aum
-                }
+                    stats[infos['bbUser']] = {
+                        'followers': followers,
+                        'stability': stability,
+                        'roi30j': roi30j,
+                        'aum': aum
+                    }
 
-                with open(stats_file, 'w') as f:
-                    json.dump(stats, f, indent=4)
+                    with open(stats_file, 'w') as f:
+                        json.dump(stats, f, indent=4)
 
-            except Exception as e:
-                print(f"An error occurred: {e}")
+                except Exception as e:
+                    print(f"An error occurred: {e}")
 
-    traders_info.sort(reverse=True, key=lambda x: (x[1].split('Stability: **')[1].split('**')[0], x[0]))
 
-    embed.description = "\u200b"
+            if infos['exchange'] == "binance":
+                embed2 = discord.Embed(title='╔════════════( Copy Traders BINANCE )═════════════╗', color=discord.Color(int("2b2d31", 16)))
+                url = f"https://www.binance.com/bapi/futures/v1/friendly/future/copy-trade/lead-portfolio/detail?portfolioId={infos['bbCode']}"
+                urlInfo = f"https://www.binance.com/bapi/futures/v1/public/future/copy-trade/lead-portfolio/performance?portfolioId={infos['bbCode']}&timeRange=30D"
+                HEADERS = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
+            }
+                try:
+                    print(urlInfo)
+                    response = await session.get(url, headers=HEADERS) 
+                    infosUser = await session.get(urlInfo, headers=HEADERS) 
+                    infosUser = json.loads(infosUser.text) 
+                    json_data = json.loads(response.text)
+                    followers = json_data['data']['currentCopyCount']
+                    #stability = json_data['result']['stableScoreLevelFormat']
+                    roi30j = float(infosUser['data']['roi'])
+                    aum = float(json_data['data']['aumAmount'])
+                    #nbdays = int(infosUser['result']['tradeDays'])
+                    trader_info2 = f"**[{infos['bbUser']}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
+                                f"🎯 ROI (30D): **{roi30j:.2f}%**\n" \
+                                f"👤 Followers: **{followers}**\n" \
+                                f"💰 AUM: **{format_aum(aum)}$**\n" \
+                                f""
+                    traders_info2.append((40, trader_info2))
 
-    for i, (roi, trader_info) in enumerate(traders_info, start=1):
-        embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
-    await message.edit(content="", embed=embed)
+
+
+                except Exception as e:
+                    print(f"An error occurred: {e}")
+
+
+        traders_info.sort(reverse=True, key=lambda x: (x[1].split('Stability: **')[1].split('**')[0], x[0]))
+        embed.description = "\u200b"
+        for i, (roi, trader_info) in enumerate(traders_info, start=1):
+            embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
+
+        for i, (roi, trader_info2) in enumerate(traders_info2, start=1):
+            embed2.add_field(name=f"", value=f"**{i}.** "+trader_info2, inline=True)
+
+        await message.edit(content="", embed=embed)
+        await ctx.send(content="", embed=embed2)
 
 
 
