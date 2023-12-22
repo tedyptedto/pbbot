@@ -303,6 +303,8 @@ async def check_traders(ctx, fromTask=False):
 
         embed.description = f"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Total AUM: __**{format_aum(total_aum)}$**__"
         embed2.description = f"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Total AUM: __**{format_aum(total_aum2)}$**__"
+        total_aum = 0
+        total_aum2 = 0
         for i, (roi, trader_info) in enumerate(traders_info, start=1):
             embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
 
