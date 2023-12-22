@@ -59,7 +59,7 @@ copytraders = [
     # BYBIT #
 
     # BINANCE #
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk⠀', 'bbCode': "3746904129636329728", 'exchange': "binance"}
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk_binance', 'bbCode': "3746904129636329728", 'exchange': "binance"}
     # BINANCE #
 ]
 
@@ -141,6 +141,10 @@ async def getUserLeaderBoard(username):
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
 
+
+total_aum = 0
+total_aum2 = 0
+
 @commands.cooldown(1, 2, commands.BucketType.user)
 @bot.command()
 async def check_traders(ctx, fromTask=False):
@@ -158,8 +162,8 @@ async def check_traders(ctx, fromTask=False):
     traders_info = []
     traders_info2 = []
     message = await ctx.send("https://i.imgur.com/c4AGtzM.gif", reference=ctx.message)
+
     async with httpx.AsyncClient(http2=True) as session:
-        embed = discord.Embed(title='╔═════════════( Copy Traders BYBIT )═════════════╗', color=discord.Color(int("2b2d31", 16)))
         for infos in copytraders:
             if infos['exchange'] == "bybit":
                 url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
@@ -179,6 +183,8 @@ async def check_traders(ctx, fromTask=False):
                     roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
                     aum = int(json_data['result']['aumE8']) / 100000000
                     nbdays = int(infosUser['result']['tradeDays'])
+                    global total_aum
+                    total_aum += aum
 
                     with open(stats_file, 'r') as f:
                         stats = json.load(f)
@@ -208,7 +214,7 @@ async def check_traders(ctx, fromTask=False):
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
                                 f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
                                 f"{leaderboardtext}" \
-                                f""
+                                f"\n"
                     traders_info.append((roi30j, trader_info))
 
                     stats[infos['bbUser']] = {
@@ -224,10 +230,16 @@ async def check_traders(ctx, fromTask=False):
 
                 except Exception as e:
                     print(f"An error occurred: {e}")
+            embed = discord.Embed(title='╔═════════════( Copy Traders BYBIT )═════════════╗', color=discord.Color(int("2b2d31", 16)))
+            #embed.add_field(name=f"", value=f"", inline=True)
+            #embed.add_field(name=f"Total AUM", value=f'{format_aum(total_aum)}$', inline=True)
+            #embed.set_footer(text=f"Total AUM: {format_aum(total_aum)}$", icon_url="https://cdn-icons-png.flaticon.com/512/5206/5206272.png")
+            #embed.add_field(name=f"", value=f"", inline=True)
+
+
 
 
             if infos['exchange'] == "binance":
-                embed2 = discord.Embed(title='╔════════════( Copy Traders BINANCE )═════════════╗', color=discord.Color(int("2b2d31", 16)))
                 url = f"https://www.binance.com/bapi/futures/v1/friendly/future/copy-trade/lead-portfolio/detail?portfolioId={infos['bbCode']}"
                 urlInfo = f"https://www.binance.com/bapi/futures/v1/public/future/copy-trade/lead-portfolio/performance?portfolioId={infos['bbCode']}&timeRange=30D"
                 HEADERS = {
@@ -244,6 +256,8 @@ async def check_traders(ctx, fromTask=False):
                     roi30j = round(float(infosUser['data']['roi']), 2)
                     aum = round(float(json_data['data']['aumAmount']), 2)
                     #nbdays = int(infosUser['result']['tradeDays'])
+                    global total_aum2
+                    total_aum2 += aum
 
 
                     with open(stats_file, 'r') as f:
@@ -258,11 +272,11 @@ async def check_traders(ctx, fromTask=False):
 
                     fire_emoji = "🔥" if roi30j >= 20.00 else ""
 
-                    trader_info2 = f"**[{infos['bbUser']}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
+                    trader_info2 = f"**[{infos['bbUser'].replace('_binance', '')}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
                                 f"🎯 ROI (30D): **{roi30j:.2f}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
-                                f""
+                                f"\n"
                     traders_info2.append((40, trader_info2))
 
 
@@ -278,11 +292,17 @@ async def check_traders(ctx, fromTask=False):
 
                 except Exception as e:
                     print(f"An error occurred: {e}")
+            embed2 = discord.Embed(title='╔════════════( Copy Traders BINANCE )════════════╗', color=discord.Color(int("2b2d31", 16)))
+            #embed2.add_field(name=f"", value=f"", inline=True)
+            #embed2.add_field(name=f"Total AUM", value=f'{format_aum(total_aum2)}$', inline=True)
+            #embed2.set_footer(text=f"Total AUM: {format_aum(total_aum2)}$", icon_url="https://cdn-icons-png.flaticon.com/512/5206/5206272.png")
+            #embed2.add_field(name=f"", value=f"", inline=True)
 
         traders_info.sort(reverse=True, key=lambda x: (x[1].split('Stability: **')[1].split('**')[0], x[0]))
         traders_info2.sort(reverse=True, key=lambda x: (float(x[1].split('ROI (30D): **')[1].split('%')[0]), x[0]))
 
-        embed.description = "\u200b"
+        embed.description = f"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Total AUM: __**{format_aum(total_aum)}$**__"
+        embed2.description = f"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Total AUM: __**{format_aum(total_aum2)}$**__"
         for i, (roi, trader_info) in enumerate(traders_info, start=1):
             embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
 
