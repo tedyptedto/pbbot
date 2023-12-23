@@ -138,7 +138,7 @@ async def getUserLeaderBoard(username):
 
             # print(json.dumps(json_data, indent=4))
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"21 An error occurred: {e}")
 
 
         return aInfos
@@ -168,10 +168,8 @@ async def check_traders(ctx, fromTask=False):
 
     traders_info = []
     traders_info2 = []
-    if message in ctx:
-        message = await ctx.send("https://i.imgur.com/c4AGtzM.gif", reference=ctx.message)
-    else:
-        message = await ctx.send("https://i.imgur.com/c4AGtzM.gif")
+    # message = await ctx.send("https://i.imgur.com/c4AGtzM.gif", reference=ctx.message) # generate a bug on Cron 
+    message = await ctx.send("https://i.imgur.com/c4AGtzM.gif")
 
     async with httpx.AsyncClient(http2=True) as session:
         for infos in copytraders:
@@ -202,12 +200,12 @@ async def check_traders(ctx, fromTask=False):
                         stats = json.load(f)
                         if infos['bbUser'] in stats:
                             prev_values = stats[infos['bbUser']]
-                            follower_arrow = get_arrow(followers, prev_values['followers'])
-                            stability_arrow = get_arrow(stability, prev_values['stability'])
-                            roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
-                            aum_arrow = get_arrow(aum, prev_values['aum'])
-                            sharpe_arrow = get_arrow(sharpe, prev_values['sharpe'])
-                            followers_pnl_arrow = get_arrow(followers_pnl, prev_values['followers_pnl'])
+                            follower_arrow = get_arrow(followers,   prev_values['followers']            if 'followers'  in prev_values else followers)
+                            stability_arrow = get_arrow(stability,  prev_values['stability']            if 'stability'  in prev_values else stability)
+                            roi_arrow = get_arrow(roi30j,           prev_values['roi30j']               if 'roi30j'     in prev_values else roi30j)
+                            aum_arrow = get_arrow(aum,              prev_values['aum']                  if 'aum'        in prev_values else aum)
+                            sharpe_arrow = get_arrow(sharpe,        prev_values['sharpe']               if 'sharpe'     in prev_values else sharpe)
+                            followers_pnl_arrow = get_arrow(followers_pnl, prev_values['followers_pnl'] if 'followers_pnl' in prev_values else followers_pnl)
                         else:
                             follower_arrow = stability_arrow = roi_arrow = aum_arrow = sharpe_arrow = followers_pnl_arrow = ""
 
@@ -247,7 +245,9 @@ async def check_traders(ctx, fromTask=False):
                         json.dump(stats, f, indent=4)
 
                 except Exception as e:
-                    print(f"An error occurred: {e}")
+                    print(f"18 An error occurred: {e}")
+                    print(e)
+                    print(str(e))
             embed = discord.Embed(title='╔═════════════( Copy Traders BYBIT )═════════════╗', color=discord.Color(int("2b2d31", 16)))
             #embed.add_field(name=f"", value=f"", inline=True)
             #embed.add_field(name=f"Total AUM", value=f'{format_aum(total_aum)}$', inline=True)
@@ -291,11 +291,11 @@ async def check_traders(ctx, fromTask=False):
                         stats = json.load(f)
                         if infos['bbUser'] in stats:
                             prev_values = stats[infos['bbUser']]
-                            follower_arrow = get_arrow(followers, prev_values['followers'])
-                            roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
-                            aum_arrow = get_arrow(aum, prev_values['aum'])
-                            sharpe_arrow = get_arrow(sharpe, prev_values['sharpe'])
-                            followers_pnl_arrow = get_arrow(followers_pnl, prev_values['followers_pnl'])
+                            follower_arrow = get_arrow(followers,           prev_values['followers'] if 'followers' in prev_values else followers_pnl)
+                            roi_arrow = get_arrow(roi30j,                   prev_values['roi30j'] if 'roi30j' in prev_values else roi30j)
+                            aum_arrow = get_arrow(aum,                      prev_values['aum'] if 'aum' in prev_values else aum)
+                            sharpe_arrow = get_arrow(sharpe,                prev_values['sharpe'] if 'sharpe' in prev_values else sharpe)
+                            followers_pnl_arrow = get_arrow(followers_pnl,  prev_values['followers_pnl'] if 'followers_pnl' in prev_values else followers_pnl)
                         else:
                             follower_arrow = roi_arrow = aum_arrow = sharpe_arrow = followers_pnl_arrow = ""
 
@@ -325,7 +325,7 @@ async def check_traders(ctx, fromTask=False):
                         json.dump(stats, f, indent=4)
 
                 except Exception as e:
-                    print(f"An error occurred: {e}")
+                    print(f"19 An error occurred: {e}")
             embed2 = discord.Embed(title='╔════════════( Copy Traders BINANCE )════════════╗', color=discord.Color(int("2b2d31", 16)))
             #embed2.add_field(name=f"", value=f"", inline=True)
             #embed2.add_field(name=f"Total AUM", value=f'{format_aum(total_aum2)}$', inline=True)
@@ -358,7 +358,8 @@ async def check_traders_error(ctx, error):
         await response.delete()
         await ctx.message.delete()
     else:
-        await ctx.send("An error occurred while executing the command.")
+        await ctx.send("20 An error occurred while executing the command.")
+        print(error)
 
 def get_arrow(current, previous):
     try:
