@@ -60,7 +60,8 @@ copytraders = [
     # BYBIT #
 
     # BINANCE #
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk_binance', 'bbCode': "3746904129636329728", 'exchange': "binance"}
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk_binance', 'bbCode': "3746904129636329728", 'exchange': "binance"},
+    {'discordUser': 'Maloz', 'bbUser': 'Maloz', 'bbCode': "3777357340021816577", 'exchange': "binance"}
     # BINANCE #
 ]
 
@@ -203,7 +204,7 @@ async def check_traders(ctx, fromTask=False):
                             roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
                             aum_arrow = get_arrow(aum, prev_values['aum'])
                             sharpe_arrow = get_arrow(sharpe, prev_values['sharpe'])
-                            followers_pnl_arrow = get_arrow(aum, prev_values['followers_pnl'])
+                            followers_pnl_arrow = get_arrow(followers_pnl, prev_values['followers_pnl'])
                         else:
                             follower_arrow = stability_arrow = roi_arrow = aum_arrow = sharpe_arrow = followers_pnl_arrow = ""
 
@@ -290,18 +291,18 @@ async def check_traders(ctx, fromTask=False):
                             follower_arrow = get_arrow(followers, prev_values['followers'])
                             roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
                             aum_arrow = get_arrow(aum, prev_values['aum'])
-                            sharpe_arrow = get_arrow(aum, prev_values['sharpe'])
-                            followers_pnl_arrow = get_arrow(aum, prev_values['followers_pnl'])
+                            sharpe_arrow = get_arrow(sharpe, prev_values['sharpe'])
+                            followers_pnl_arrow = get_arrow(followers_pnl, prev_values['followers_pnl'])
                         else:
                             follower_arrow = roi_arrow = aum_arrow = sharpe_arrow = followers_pnl_arrow = ""
 
                     fire_emoji = "🔥" if roi30j >= 20.00 else ""
 
                     trader_info2 = f"**[{infos['bbUser'].replace('_binance', '')}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
-                                f"🗓️ **{days+1:.0f}** Days\n" \
+                                f"🗓️ **{days:.0f}** Days\n" \
                                 f"🎯 ROI (30D): **{roi30j:.2f}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
-                                f"👤 Flw PNL: **{followers_pnl:.2f}** {followers_pnl_arrow}\n" \
+                                f"👥 Flw PNL: **{followers_pnl:.2f}** {followers_pnl_arrow}\n" \
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
                                 f"{sharpe_message}" \
                                 f"\n"
