@@ -15,6 +15,7 @@ from urllib.parse import quote
 import os
 import httpx
 import json
+import time
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -75,16 +76,20 @@ def check_or_create_stats_file():
             if trader['exchange'] == "bybit":
                 stats[trader['bbUser']] = {
                     'followers': 0,
+                    'followers_pnl': 0,
                     'stability': 0,
                     'roi30j': 0,
                     'aum': 0,
+                    'sharpe': float(0.00),
                     'exchange': "bybit"
                 }
             if trader['exchange'] == "binance":
                 stats[trader['bbUser']] = {
                     'followers': 0,
+                    'followers_pnl': 0,
                     'roi30j': 0,
                     'aum': 0,
+                    'sharpe': float(0.00),
                     'exchange': "binance"
                 }
         with open(stats_file, 'w') as f:
@@ -145,6 +150,7 @@ async def on_ready():
 total_aum = 0
 total_aum2 = 0
 
+
 @commands.cooldown(1, 2, commands.BucketType.user)
 @bot.command()
 async def check_traders(ctx, fromTask=False):
@@ -174,15 +180,17 @@ async def check_traders(ctx, fromTask=False):
                 try:
                     response = await session.get(url, headers=HEADERS) 
                     infosUser = await session.get(urlInfo, headers=HEADERS) 
-                    # print(urlInfo)
-                    # print(infosUser.text)
+                    #print(urlInfo)
+                    #print(infosUser)
                     infosUser = json.loads(infosUser.text) 
                     json_data = json.loads(response.text)
                     followers = json_data['result']['currentFollowerCount']
+                    followers_pnl = round(float(json_data['result']['thirtyDayFollowerYieldE8']) / 100000000, 2)
                     stability = json_data['result']['stableScoreLevelFormat']
                     roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
                     aum = int(json_data['result']['aumE8']) / 100000000
                     nbdays = int(infosUser['result']['tradeDays'])
+                    sharpe = round(int(json_data['result']['thirtyDaySharpeRatioE4']) / 10000, 2)
                     global total_aum
                     total_aum += aum
 
@@ -194,8 +202,10 @@ async def check_traders(ctx, fromTask=False):
                             stability_arrow = get_arrow(stability, prev_values['stability'])
                             roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
                             aum_arrow = get_arrow(aum, prev_values['aum'])
+                            sharpe_arrow = get_arrow(sharpe, prev_values['sharpe'])
+                            followers_pnl_arrow = get_arrow(aum, prev_values['followers_pnl'])
                         else:
-                            follower_arrow = stability_arrow = roi_arrow = aum_arrow = ""
+                            follower_arrow = stability_arrow = roi_arrow = aum_arrow = sharpe_arrow = followers_pnl_arrow = ""
 
                     fire_emoji = "🔥" if roi30j >= 20.00 else ""
 
@@ -211,17 +221,21 @@ async def check_traders(ctx, fromTask=False):
                                 f"🗓️ **{nbdays}** Days\n" \
                                 f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
+                                f"👥 Flw PNL: **{followers_pnl:.2f}** {followers_pnl_arrow}\n" \
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
                                 f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
+                                f"🔪 Sharpe (30D): **{sharpe:.2f}** {sharpe_arrow}\n" \
                                 f"{leaderboardtext}" \
                                 f"\n"
                     traders_info.append((roi30j, trader_info))
 
                     stats[infos['bbUser']] = {
                         'followers': followers,
+                        'followers_pnl': round(followers_pnl, 2),
                         'stability': stability,
                         'roi30j': roi30j,
                         'aum': aum,
+                        'sharpe': round(sharpe, 2),
                         'exchange': "bybit"
                     }
 
@@ -245,19 +259,28 @@ async def check_traders(ctx, fromTask=False):
                 HEADERS = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
             }
+            
                 try:
                     #print(urlInfo)
                     response = await session.get(url, headers=HEADERS) 
                     infosUser = await session.get(urlInfo, headers=HEADERS) 
                     infosUser = json.loads(infosUser.text) 
                     json_data = json.loads(response.text)
-                    followers = json_data['data']['currentCopyCount']
+                    followers = round(float(json_data['data']['currentCopyCount']))
+                    followers_pnl = float(json_data['data']['copierPnl'])
                     #stability = json_data['result']['stableScoreLevelFormat']
                     roi30j = round(float(infosUser['data']['roi']), 2)
                     aum = round(float(json_data['data']['aumAmount']), 2)
                     #nbdays = int(infosUser['result']['tradeDays'])
+                    sharpe = round(float(json_data['data']['sharpRatio'], 3)) if json_data['data']['sharpRatio'] != None else 0.0
                     global total_aum2
                     total_aum2 += aum
+                    timestamp_trader = json_data['data']['startTime'] / 1000
+                    timestamp_today = int(time.time())  # Dzisiejszy timestamp (aktualny czas)
+                    days = (timestamp_today - timestamp_trader) / (24 * 3600)  # 24 godziny * 3600 sekund = 1 dzień
+
+                    sharpe_message = f"🔪 Sharpe (30D): **{float(sharpe):.2f}** {sharpe_arrow}\n" if days >= 30 else ""
+                    
 
 
                     with open(stats_file, 'r') as f:
@@ -267,23 +290,30 @@ async def check_traders(ctx, fromTask=False):
                             follower_arrow = get_arrow(followers, prev_values['followers'])
                             roi_arrow = get_arrow(roi30j, prev_values['roi30j'])
                             aum_arrow = get_arrow(aum, prev_values['aum'])
+                            sharpe_arrow = get_arrow(aum, prev_values['sharpe'])
+                            followers_pnl_arrow = get_arrow(aum, prev_values['followers_pnl'])
                         else:
-                            follower_arrow = roi_arrow = aum_arrow = ""
+                            follower_arrow = roi_arrow = aum_arrow = sharpe_arrow = followers_pnl_arrow = ""
 
                     fire_emoji = "🔥" if roi30j >= 20.00 else ""
 
                     trader_info2 = f"**[{infos['bbUser'].replace('_binance', '')}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
+                                f"🗓️ **{days+1:.0f}** Days\n" \
                                 f"🎯 ROI (30D): **{roi30j:.2f}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
+                                f"👤 Flw PNL: **{followers_pnl:.2f}** {followers_pnl_arrow}\n" \
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
+                                f"{sharpe_message}" \
                                 f"\n"
                     traders_info2.append((40, trader_info2))
 
 
                     stats[infos['bbUser']] = {
                         'followers': followers,
+                        'followers_pnl': round(followers_pnl, 2),
                         'roi30j': roi30j,
                         'aum': aum,
+                        'sharpe': round(sharpe, 2),
                         'exchange': "binance"
                     }
 
