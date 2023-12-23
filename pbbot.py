@@ -168,7 +168,10 @@ async def check_traders(ctx, fromTask=False):
 
     traders_info = []
     traders_info2 = []
-    message = await ctx.send("https://i.imgur.com/c4AGtzM.gif", reference=ctx.message)
+    if message in ctx:
+        message = await ctx.send("https://i.imgur.com/c4AGtzM.gif", reference=ctx.message)
+    else:
+        message = await ctx.send("https://i.imgur.com/c4AGtzM.gif")
 
     async with httpx.AsyncClient(http2=True) as session:
         for infos in copytraders:
