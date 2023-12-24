@@ -223,7 +223,7 @@ async def check_traders(ctx, fromTask=False):
                                 f"🗓️ **{nbdays}** Days\n" \
                                 f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
-                                f"👥 Flw PNL: **{followers_pnl:.2f}** {followers_pnl_arrow}\n" \
+                                f"👥 Flw PNL: **{format_aum(followers_pnl)}$** {followers_pnl_arrow}\n" \
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
                                 f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
                                 f"🔪 Sharpe (30D): **{sharpe:.2f}** {sharpe_arrow}\n" \
@@ -305,7 +305,7 @@ async def check_traders(ctx, fromTask=False):
                                 f"🗓️ **{days:.0f}** Days\n" \
                                 f"🎯 ROI (30D): **{roi30j:.2f}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
-                                f"👥 Flw PNL: **{followers_pnl:.2f}** {followers_pnl_arrow}\n" \
+                                f"👥 Flw PNL: **{format_aum(followers_pnl)}$** {followers_pnl_arrow}\n" \
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
                                 f"{sharpe_message}" \
                                 f"\n"
