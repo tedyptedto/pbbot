@@ -276,7 +276,7 @@ async def check_traders(ctx, fromTask=False):
                     roi30j = round(float(infosUser['data']['roi']), 2)
                     aum = round(float(json_data['data']['aumAmount']), 2)
                     #nbdays = int(infosUser['result']['tradeDays'])
-                    sharpe = round(float(json_data['data']['sharpRatio'], 3)) if json_data['data']['sharpRatio'] != None else 0.0
+                    sharpe = round(float(json_data['data']['sharpRatio']), 3) if json_data['data']['sharpRatio'] != None else 0.0
                     global total_aum2
                     total_aum2 += aum
                     timestamp_trader = json_data['data']['startTime'] / 1000
