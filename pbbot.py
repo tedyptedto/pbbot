@@ -43,6 +43,7 @@ copytraders = [
     {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D", 'exchange': "bybit"},
     {'discordUser': 'mani', 'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D", 'exchange': "bybit"},
     {'discordUser': 'mani', 'bbUser': 'manicptlowrisk2', 'bbCode': "jGPes4W1lsptyz6Lxmwkxg%3D%3D", 'exchange': "bybit"},
+    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk3', 'bbCode': "dfgxB7g/cKRFvDDVz0r4Iw==", 'exchange': "bybit"},
 
     {'discordUser': 'tedyptedto', 'bbUser': 'tedyptedtoCpTr', 'bbCode': "VAfEwFPZdNdfYGWiwy7V0g%3D%3D", 'exchange': "bybit"},
     {'discordUser': 'tedyptedto', 'bbUser': 'tedySub2', 'bbCode': "W86y5Bo8c78Cy803QgMwMg%3D%3D", 'exchange': "bybit"},
@@ -52,6 +53,8 @@ copytraders = [
     {'discordUser': 'jnk_xnxx', 'bbUser': 'jnkmone', 'bbCode': "I7eQ24u71qN5fYJ%2BbnXXlQ%3D%3D", 'exchange': "bybit"},
     
     {'discordUser': 'Hawkeye', 'bbUser': 'Hawkbot scalper', 'bbCode': "3U0%2BHYawCwEVdm12DBs5cA%3D%3D", 'exchange': "bybit"},
+
+    {'discordUser': 'justincrap', 'bbUser': 'Justin_grid', 'bbCode': "BT2AU20De/7u//z2MzEpRQ==", 'exchange': "bybit"},
 
     {'discordUser': 'iamtheonewhoknocks', 'bbUser': 'IamtheonewhoKnocks', 'bbCode': "b5ChnV8%2BGglQIpaZEA29ug%3D%3D", 'exchange': "bybit"},
     
