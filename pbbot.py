@@ -57,6 +57,8 @@ copytraders = [
     {'discordUser': 'justincrap', 'bbUser': 'Justin_grid', 'bbCode': "BT2AU20De/7u//z2MzEpRQ==", 'exchange': "bybit"},
 
     {'discordUser': 'iamtheonewhoknocks', 'bbUser': 'IamtheonewhoKnocks', 'bbCode': "b5ChnV8%2BGglQIpaZEA29ug%3D%3D", 'exchange': "bybit"},
+
+    {'discordUser': 'BitSync', 'bbUser': 'BitSync', 'bbCode': "jLtvcLOKKl8c3asbDwINEQ==", 'exchange': "bybit"},
     
     # BYBIT #
 
