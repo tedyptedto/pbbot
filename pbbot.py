@@ -31,42 +31,89 @@ if not getattr(intents, 'message_content', True):
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-copytraders = [
 
-    # BYBIT
-    {'discordUser': 'xaocarlo', 'bbUser': 'xaocarlo', 'bbCode': "JKuwFA2ebE%2BUhjKrItsMbA%3D%3D", 'exchange': "bybit"},
-    {'discordUser': 'xaocarlo', 'bbUser': 'RUCapital07', 'bbCode': "WdGj1QiU4kv1FoLP6%2FTLqg%3D%3D", 'exchange': "bybit"},
-
-    {'discordUser': 'LuaN', 'bbUser': 'luantesting', 'bbCode': "y3R6ru2Yv6mVK3t7bebfJQ%3D%3D", 'exchange': "bybit"},
-    {'discordUser': 'LuaN', 'bbUser': 'luanmain', 'bbCode': "XqusunZ9%2FNPX5IMAdmHvKg%3D%3D", 'exchange': "bybit"},
-
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk', 'bbCode': "JwT%2Ba21FcgJXHhs6%2BqVxZw%3D%3D", 'exchange': "bybit"},
-    {'discordUser': 'mani', 'bbUser': 'manicptrndr', 'bbCode': "ciOb3vGv0dp8JKJp4WTmeg%3D%3D", 'exchange': "bybit"},
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk2', 'bbCode': "jGPes4W1lsptyz6Lxmwkxg%3D%3D", 'exchange': "bybit"},
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk3', 'bbCode': "dfgxB7g/cKRFvDDVz0r4Iw==", 'exchange': "bybit"},
-
-    {'discordUser': 'tedyptedto', 'bbUser': 'tedyptedtoCpTr', 'bbCode': "VAfEwFPZdNdfYGWiwy7V0g%3D%3D", 'exchange': "bybit"},
-    {'discordUser': 'tedyptedto', 'bbUser': 'tedySub2', 'bbCode': "W86y5Bo8c78Cy803QgMwMg%3D%3D", 'exchange': "bybit"},
-    {'discordUser': 'tedyptedto', 'bbUser': 'Tedy57123TheBestOne', 'bbCode': "K%2Bupto5fn8zpUpIY0GvI%2FA%3D%3D", 'exchange': "bybit"},
-
-    {'discordUser': 'jnk_xnxx', 'bbUser': 'jnk777', 'bbCode': "1o7jD8RX7meCMGaqG2tE3w%3D%3D", 'exchange': "bybit"},
-    {'discordUser': 'jnk_xnxx', 'bbUser': 'jnkmone', 'bbCode': "I7eQ24u71qN5fYJ%2BbnXXlQ%3D%3D", 'exchange': "bybit"},
+@bot.command()
+async def add(ctx, discord_user, bb_user, bb_code, exchange):
+    allowed_users = ['jnk_xnxx', 'tedyptedto']
+    if ctx.message.author.name not in allowed_users:
+        bot_response = await ctx.send("You are not authorized to use this command.")
+        await asyncio.sleep(5)
+        await ctx.message.delete()
+        await bot_response.delete()
+        return
+    if any(arg is None for arg in [discord_user, bb_user, bb_code, exchange]):
+        bot_response = await ctx.send("Please provide all arguments: `discord_user`, `bb_user`, `bb_code`, `exchange`.")
+        await asyncio.sleep(5)
+        await ctx.message.delete()
+        await bot_response.delete()
+        return
+    new_trader = {
+        "discordUser": discord_user,
+        "bbUser": bb_user,
+        "bbCode": bb_code,
+        "exchange": exchange
+    }
+    with open(base_dir +'/config/copytraders.json', 'r') as file:
+        traders = json.load(file)
+    traders.append(new_trader)
     
-    {'discordUser': 'Hawkeye', 'bbUser': 'Hawkbot scalper', 'bbCode': "3U0%2BHYawCwEVdm12DBs5cA%3D%3D", 'exchange': "bybit"},
-
-    {'discordUser': 'justincrap', 'bbUser': 'Justin_grid', 'bbCode': "BT2AU20De/7u//z2MzEpRQ==", 'exchange': "bybit"},
-
-    {'discordUser': 'iamtheonewhoknocks', 'bbUser': 'IamtheonewhoKnocks', 'bbCode': "b5ChnV8%2BGglQIpaZEA29ug%3D%3D", 'exchange': "bybit"},
-
-    {'discordUser': 'BitSync', 'bbUser': 'BitSync', 'bbCode': "jLtvcLOKKl8c3asbDwINEQ==", 'exchange': "bybit"},
+    with open(base_dir +'/config/copytraders.json', 'w') as file:
+        json.dump(traders, file, indent=4)
     
-    # BYBIT #
+    bot_response = await ctx.send(f"User **{discord_user}** added to copytrading list!")
+    await asyncio.sleep(5)
+    await ctx.message.delete()
+    await bot_response.delete()
 
-    # BINANCE #
-    {'discordUser': 'mani', 'bbUser': 'manicptlowrisk_binance', 'bbCode': "3746904129636329728", 'exchange': "binance"},
-    {'discordUser': 'Maloz', 'bbUser': 'Maloz', 'bbCode': "3777357340021816577", 'exchange': "binance"}
-    # BINANCE #
-]
+
+@bot.command()
+async def remove(ctx, discord_user: str, bb_user: str, bb_code: str, exchange: str):
+    allowed_users = ['jnk_xnxx', 'tedyptedto']
+    if ctx.message.author.name not in allowed_users:
+        bot_response = await ctx.send("You are not authorized to use this command.")
+        await asyncio.sleep(5)
+        await ctx.message.delete()
+        await bot_response.delete()
+        return
+    if any(arg is None for arg in [discord_user, bb_user, bb_code, exchange]):
+        bot_response = await ctx.send("Please provide all arguments: `discord_user`, `bb_user`, `bb_code`, `exchange`.")
+        await asyncio.sleep(5)
+        await ctx.message.delete()
+        await bot_response.delete()
+        return
+    with open(base_dir + '/config/copytraders.json', 'r') as file:
+        traders = json.load(file)
+    
+    removed = False
+    for trader in traders:
+        if (
+            trader['discordUser'] == discord_user
+            and trader['bbUser'] == bb_user
+            and trader['bbCode'] == bb_code
+            and trader['exchange'] == exchange
+        ):
+            traders.remove(trader)
+            removed = True
+            break
+    
+    if removed:
+        with open(base_dir + '/config/copytraders.json', 'w') as file:
+            json.dump(traders, file, indent=4)
+        bot_response = await ctx.send(f"User **{discord_user}** removed to copytrading list!")
+        await asyncio.sleep(5)
+        await ctx.message.delete()
+        await bot_response.delete()
+    else:
+        bot_response = await ctx.send(f"User **{discord_user}** not found in the traders list.")
+        await asyncio.sleep(5)
+        await ctx.message.delete()
+        await bot_response.delete()
+
+
+copytraders = []
+with open(base_dir + '/config/copytraders.json', 'r') as file:
+    copytraders = json.load(file)
+
 
 stats_file = base_dir + "/config/stats.json"
 last_check_time = 0
@@ -158,6 +205,8 @@ total_aum2 = 0
 @commands.cooldown(1, 2, commands.BucketType.user)
 @bot.command()
 async def check_traders(ctx, fromTask=False):
+    with open(base_dir +'/config/copytraders.json', 'r') as file:
+        copytraders = json.load(file)
     global channelId
     global last_check_time
     global cache_leaderboard
