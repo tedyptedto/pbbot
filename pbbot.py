@@ -221,7 +221,7 @@ async def check_traders(ctx, fromTask=False):
     traders_info = []
     traders_info2 = []
     # message = await ctx.send("https://i.imgur.com/c4AGtzM.gif", reference=ctx.message) # generate a bug on Cron 
-    message = await ctx.send("https://i.imgur.com/c4AGtzM.gif")
+    message = await ctx.send("Loading data, please wait...")
 
     async with httpx.AsyncClient(http2=True) as session:
         for infos in copytraders:
@@ -384,8 +384,8 @@ async def check_traders(ctx, fromTask=False):
             #embed2.set_footer(text=f"Total AUM: {format_aum(total_aum2)}$", icon_url="https://cdn-icons-png.flaticon.com/512/5206/5206272.png")
             #embed2.add_field(name=f"", value=f"", inline=True)
 
-        traders_info.sort(reverse=True, key=lambda x: (x[1].split('Stability: **')[1].split('**')[0], x[0]))
-        traders_info2.sort(reverse=True, key=lambda x: (float(x[1].split('ROI (30D): **')[1].split('%')[0]), x[0]))
+        traders_info.sort(reverse=True, key=lambda x: x[0])
+        traders_info2.sort(reverse=True, key=lambda x: x[0])
 
         embed.description = f"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Total AUM: __**{format_aum(total_aum)}$**__"
         embed2.description = f"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Total AUM: __**{format_aum(total_aum2)}$**__"
