@@ -300,7 +300,7 @@ async def check_traders(ctx, fromTask=False):
                     print(f"18 An error occurred: {e}")
                     print(e)
                     print(str(e))
-            embed = discord.Embed(title='╔═════════════( Copy Traders BYBIT )═════════════╗', color=discord.Color(int("2b2d31", 16)))
+            embed = discord.Embed(title='╔════════════( Copy Traders BYBIT 30D )══════════╗', color=discord.Color(int("2b2d31", 16)))
             #embed.add_field(name=f"", value=f"", inline=True)
             #embed.add_field(name=f"Total AUM", value=f'{format_aum(total_aum)}$', inline=True)
             #embed.set_footer(text=f"Total AUM: {format_aum(total_aum)}$", icon_url="https://cdn-icons-png.flaticon.com/512/5206/5206272.png")
@@ -335,7 +335,7 @@ async def check_traders(ctx, fromTask=False):
                     timestamp_today = int(time.time())  # Dzisiejszy timestamp (aktualny czas)
                     days = (timestamp_today - timestamp_trader) / (24 * 3600)  # 24 godziny * 3600 sekund = 1 dzień
 
-                    sharpe_message = f"🔪 Sharpe (30D): **{float(sharpe):.2f}** {sharpe_arrow}\n" if days >= 30 else ""
+                    sharpe_message = f"🔪 Sharpe : **{float(sharpe):.2f}** {sharpe_arrow}\n" if days >= 30 else ""
                     
 
 
@@ -354,8 +354,8 @@ async def check_traders(ctx, fromTask=False):
                     fire_emoji = "🔥" if roi30j >= 20.00 else ""
 
                     trader_info2 = f"**[{infos['bbUser'].replace('_binance', '')}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
-                                f"🗓️ **{days:.0f}** Days\n" \
-                                f"🎯 ROI (30D): **{roi30j:.2f}%** {fire_emoji} {roi_arrow}\n" \
+                                f"🗓️ **{days:.0f}** D\n" \
+                                f"🎯 ROI: **{roi30j:.2f}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
                                 f"👥 Flw PNL: **{format_aum(followers_pnl)}$** {followers_pnl_arrow}\n" \
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
