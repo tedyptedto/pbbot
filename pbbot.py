@@ -391,13 +391,20 @@ async def check_traders(ctx, fromTask=False):
         embed2.description = f"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Total AUM: __**{format_aum(total_aum2)}$**__"
         total_aum = 0
         total_aum2 = 0
+
+        embed_2 = discord.Embed(title='', color=discord.Color(int("2b2d31", 16)))
+        embed_2.description = f"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ"
         for i, (roi, trader_info) in enumerate(traders_info, start=1):
-            embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
+            if i <= 20:
+                embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
+            else:
+                embed_2.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
 
         for i, (roi, trader_info2) in enumerate(traders_info2, start=1):
             embed2.add_field(name=f"", value=f"**{i}.** "+trader_info2, inline=True)
 
         await message.edit(content="", embed=embed)
+        await ctx.send(content="", embed=embed_2)
         await ctx.send(content="", embed=embed2)
 
 
