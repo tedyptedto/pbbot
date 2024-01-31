@@ -395,7 +395,7 @@ async def check_traders(ctx, fromTask=False):
         embed_2 = discord.Embed(title='', color=discord.Color(int("2b2d31", 16)))
         embed_2.description = f"ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ"
         for i, (roi, trader_info) in enumerate(traders_info, start=1):
-            if i <= 20:
+            if i <= 15:
                 embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
             else:
                 embed_2.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
