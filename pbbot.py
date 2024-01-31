@@ -239,12 +239,12 @@ async def check_traders(ctx, fromTask=False):
                     infosUser = json.loads(infosUser.text) 
                     json_data = json.loads(response.text)
                     followers = json_data['result']['currentFollowerCount']
-                    followers_pnl = round(float(json_data['result']['thirtyDayFollowerYieldE8']) / 100000000, 2)
+                    followers_pnl = round(float(json_data['result']['ninetyDayFollowerYieldE8']) / 100000000, 2)
                     stability = json_data['result']['stableScoreLevelFormat']
-                    roi30j = int(json_data['result']['thirtyDayYieldRateE4']) / 100
+                    roi30j = int(json_data['result']['ninetyDayYieldRateE4']) / 100
                     aum = int(json_data['result']['aumE8']) / 100000000
                     nbdays = int(infosUser['result']['tradeDays'])
-                    sharpe = round(int(json_data['result']['thirtyDaySharpeRatioE4']) / 10000, 2)
+                    sharpe = round(int(json_data['result']['ninetyDaySharpeRatioE4']) / 10000, 2)
                     global total_aum
                     total_aum += aum
 
@@ -273,12 +273,12 @@ async def check_traders(ctx, fromTask=False):
 
                     trader_info = f"**[{infos['bbUser']}](https://www.bybit.com/copyTrade/trade-center/detail?leaderMark={infos['bbCode']})**\n" \
                                 f"🗓️ **{nbdays}** Days\n" \
-                                f"🎯 ROI (30D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
+                                f"🎯 ROI (90D): **{roi30j}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
                                 f"👥 Flw PNL: **{format_aum(followers_pnl)}$** {followers_pnl_arrow}\n" \
                                 f"💰 AUM: **{format_aum(aum)}$** {aum_arrow}\n" \
                                 f"⚖️ Stability: **{stability}** {stability_arrow}\n" \
-                                f"🔪 Sharpe (30D): **{sharpe:.2f}** {sharpe_arrow}\n" \
+                                f"🔪 Sharpe (90D): **{sharpe:.2f}** {sharpe_arrow}\n" \
                                 f"{leaderboardtext}" \
                                 f"\n"
                     traders_info.append((roi30j, trader_info))
@@ -300,7 +300,7 @@ async def check_traders(ctx, fromTask=False):
                     print(f"18 An error occurred: {e}")
                     print(e)
                     print(str(e))
-            embed = discord.Embed(title='╔════════════( Copy Traders BYBIT 30D )══════════╗', color=discord.Color(int("2b2d31", 16)))
+            embed = discord.Embed(title='╔════════════( Copy Traders BYBIT 90D )══════════╗', color=discord.Color(int("2b2d31", 16)))
             #embed.add_field(name=f"", value=f"", inline=True)
             #embed.add_field(name=f"Total AUM", value=f'{format_aum(total_aum)}$', inline=True)
             #embed.set_footer(text=f"Total AUM: {format_aum(total_aum)}$", icon_url="https://cdn-icons-png.flaticon.com/512/5206/5206272.png")
