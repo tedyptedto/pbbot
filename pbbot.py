@@ -311,7 +311,7 @@ async def check_traders(ctx, fromTask=False):
 
             if infos['exchange'] == "binance":
                 url = f"https://www.binance.com/bapi/futures/v1/friendly/future/copy-trade/lead-portfolio/detail?portfolioId={infos['bbCode']}"
-                urlInfo = f"https://www.binance.com/bapi/futures/v1/public/future/copy-trade/lead-portfolio/performance?portfolioId={infos['bbCode']}&timeRange=30D"
+                urlInfo = f"https://www.binance.com/bapi/futures/v1/public/future/copy-trade/lead-portfolio/performance?portfolioId={infos['bbCode']}&timeRange=90D"
                 HEADERS = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
             }
@@ -332,8 +332,8 @@ async def check_traders(ctx, fromTask=False):
                     global total_aum2
                     total_aum2 += aum
                     timestamp_trader = json_data['data']['startTime'] / 1000
-                    timestamp_today = int(time.time())  # Dzisiejszy timestamp (aktualny czas)
-                    days = (timestamp_today - timestamp_trader) / (24 * 3600)  # 24 godziny * 3600 sekund = 1 dzień
+                    timestamp_today = int(time.time())
+                    days = (timestamp_today - timestamp_trader) / (24 * 3600) 
 
                     sharpe_message = f"🔪 Sharpe : **{float(sharpe):.2f}** {sharpe_arrow}\n" if days >= 30 else ""
                     
@@ -354,7 +354,7 @@ async def check_traders(ctx, fromTask=False):
                     fire_emoji = "🔥" if roi30j >= 20.00 else ""
 
                     trader_info2 = f"**[{infos['bbUser'].replace('_binance', '')}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
-                                f"🗓️ **{days:.0f}** D\n" \
+                                f"🗓️ **{days:.0f}** Days\n" \
                                 f"🎯 ROI: **{roi30j:.2f}%** {fire_emoji} {roi_arrow}\n" \
                                 f"👤 Followers: **{followers}** {follower_arrow}\n" \
                                 f"👥 Flw PNL: **{format_aum(followers_pnl)}$** {followers_pnl_arrow}\n" \
