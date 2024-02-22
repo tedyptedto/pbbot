@@ -31,6 +31,41 @@ if not getattr(intents, 'message_content', True):
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+@bot.command()
+async def send_copytraders_data(ctx):
+    allowed_users = ['jnk_xnxx', 'tedyptedto']  # Lista użytkowników uprawnionych do tej komendy
+    if ctx.message.author.name not in allowed_users:
+        bot_response = await ctx.send("You are not authorized to use this command.")
+        await asyncio.sleep(5)
+        await ctx.message.delete()
+        await bot_response.delete()
+        return
+
+    with open(base_dir + '/config/copytraders.json', 'r') as file:
+        copytraders_data = json.load(file)
+
+    chunks = []
+    chunk = {}
+    counter = 0
+
+    for entry in copytraders_data:
+        chunk.update({str(counter): entry})
+        counter += 1
+        if counter % 4 == 0:
+            chunks.append(chunk)
+            chunk = {}
+
+    if chunk:
+        chunks.append(chunk)
+
+    for i, chunk_data in enumerate(chunks, start=1):
+        message = f"```\n{json.dumps(chunk_data, indent=4)}\n```"
+        await ctx.author.send(message)
+        await asyncio.sleep(1)  # Dodatkowe opóźnienie dla uniknięcia problemów z API Discorda
+
+    await asyncio.sleep(5)
+    await ctx.message.delete()
+
 
 @bot.command()
 async def add(ctx, discord_user, bb_user, bb_code, exchange):
