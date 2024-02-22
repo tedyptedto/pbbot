@@ -33,7 +33,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.command()
 async def send_copytraders_data(ctx):
-    allowed_users = ['jnk_xnxx', 'tedyptedto']  # Lista użytkowników uprawnionych do tej komendy
+    allowed_users = ['jnk_xnxx', 'tedyptedto']
     if ctx.message.author.name not in allowed_users:
         bot_response = await ctx.send("You are not authorized to use this command.")
         await asyncio.sleep(5)
@@ -43,6 +43,9 @@ async def send_copytraders_data(ctx):
 
     with open(base_dir + '/config/copytraders.json', 'r') as file:
         copytraders_data = json.load(file)
+
+    # Sortowanie po discordUser
+    copytraders_data.sort(key=lambda x: x['discordUser'])
 
     chunks = []
     chunk = {}
@@ -61,10 +64,11 @@ async def send_copytraders_data(ctx):
     for i, chunk_data in enumerate(chunks, start=1):
         message = f"```\n{json.dumps(chunk_data, indent=4)}\n```"
         await ctx.author.send(message)
-        await asyncio.sleep(1)  # Dodatkowe opóźnienie dla uniknięcia problemów z API Discorda
+        await asyncio.sleep(1)
 
     await asyncio.sleep(5)
     await ctx.message.delete()
+
 
 
 @bot.command()
