@@ -33,7 +33,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.command()
 async def send_copytraders_data(ctx):
-    allowed_users = ['jnk_xnxx', 'tedyptedto']  # Lista użytkowników uprawnionych do tej komendy
+    allowed_users = ['jnk_xnxx', 'tedyptedto']
     if ctx.message.author.name not in allowed_users:
         bot_response = await ctx.send("You are not authorized to use this command.")
         await asyncio.sleep(5)
@@ -44,7 +44,6 @@ async def send_copytraders_data(ctx):
     with open(base_dir + '/config/copytraders.json', 'r') as file:
         copytraders_data = json.load(file)
 
-    # Sortowanie po discordUser
     copytraders_data.sort(key=lambda x: x['discordUser'])
 
     chunks = []
@@ -64,7 +63,7 @@ async def send_copytraders_data(ctx):
     for i, chunk_data in enumerate(chunks, start=1):
         message = f"```\n{json.dumps(chunk_data, indent=4)}\n```"
         await ctx.author.send(message)
-        await asyncio.sleep(1)  # Dodatkowe opóźnienie dla uniknięcia problemów z API Discorda
+        await asyncio.sleep(1)
 
     await asyncio.sleep(5)
     await ctx.message.delete()
@@ -314,7 +313,7 @@ async def check_traders(ctx, fromTask=False):
                         else:
                             follower_arrow = stability_arrow = roi_arrow = aum_arrow = sharpe_arrow = followers_pnl_arrow = ""
 
-                    fire_emoji = "🔥" if roi30j >= 20.00 else ""
+                    fire_emoji = "🔥" if roi30j >= 65.00 else ""
 
                     aLeaderboard = (await getUserLeaderBoard(infos['bbUser']))
 
@@ -354,10 +353,6 @@ async def check_traders(ctx, fromTask=False):
                     print(e)
                     print(str(e))
             embed = discord.Embed(title='╔════════════( Copy Traders BYBIT 90D )════════════╗', color=discord.Color(int("2b2d31", 16)))
-            #embed.add_field(name=f"", value=f"", inline=True)
-            #embed.add_field(name=f"Total AUM", value=f'{format_aum(total_aum)}$', inline=True)
-            #embed.set_footer(text=f"Total AUM: {format_aum(total_aum)}$", icon_url="https://cdn-icons-png.flaticon.com/512/5206/5206272.png")
-            #embed.add_field(name=f"", value=f"", inline=True)
 
 
 
@@ -404,7 +399,7 @@ async def check_traders(ctx, fromTask=False):
                         else:
                             follower_arrow = roi_arrow = aum_arrow = sharpe_arrow = followers_pnl_arrow = ""
 
-                    fire_emoji = "🔥" if roi30j >= 20.00 else ""
+                    fire_emoji = "🔥" if roi30j >= 65.00 else ""
 
                     trader_info2 = f"**[{infos['bbUser'].replace('_binance', '')}](https://www.binance.com/en/copy-trading/lead-details?portfolioId={infos['bbCode']})**\n" \
                                 f"🗓️ **{days:.0f}** Days\n" \
@@ -432,10 +427,6 @@ async def check_traders(ctx, fromTask=False):
                 except Exception as e:
                     print(f"19 An error occurred: {e}")
             embed2 = discord.Embed(title='╔════════════( Copy Traders BINANCE )════════════╗', color=discord.Color(int("2b2d31", 16)))
-            #embed2.add_field(name=f"", value=f"", inline=True)
-            #embed2.add_field(name=f"Total AUM", value=f'{format_aum(total_aum2)}$', inline=True)
-            #embed2.set_footer(text=f"Total AUM: {format_aum(total_aum2)}$", icon_url="https://cdn-icons-png.flaticon.com/512/5206/5206272.png")
-            #embed2.add_field(name=f"", value=f"", inline=True)
 
         traders_info.sort(reverse=True, key=lambda x: x[0])
         traders_info2.sort(reverse=True, key=lambda x: x[0])
@@ -447,7 +438,6 @@ async def check_traders(ctx, fromTask=False):
 
         embed_2 = discord.Embed(title='╠════════════( Copy Traders BYBIT 90D )════════════╣', color=discord.Color(int("2b2d31", 16)))
         embed_3 = discord.Embed(title='╚════════════( Copy Traders BYBIT 90D )════════════╝', color=discord.Color(int("2b2d31", 16)))
-        #embed_2.description = f"╠════════════( Copy Traders BYBIT 90D )════════════╣"
         for i, (roi, trader_info) in enumerate(traders_info, start=1):
             if i <= 15:
                 embed.add_field(name=f"", value=f"**{i}.** "+trader_info, inline=True)
@@ -461,6 +451,7 @@ async def check_traders(ctx, fromTask=False):
 
         await ctx.send(content="", embed=embed)
         await ctx.send(content="", embed=embed_2)
+        await ctx.send(content="", embed=embed_3)
         await ctx.send(content="", embed=embed2)
 
 
