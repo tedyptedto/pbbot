@@ -211,7 +211,8 @@ check_or_create_stats_file()
 
 async def getUserLeaderBoard(username):
     global cache_leaderboard
-    async with httpx.AsyncClient(http2=True) as session:
+    timeout = httpx.Timeout(60.0)  # Timeout total de 60 secondes
+    async with httpx.AsyncClient(http2=True, timeout=timeout) as session:
         timestamp = int(time.time() * 1000)
         url = f"https://api2.bybit.com/fapi/beehive/private/v1/common/recommend-leaders?timeStamp={timestamp}&language=en"
         HEADERS = {
@@ -225,7 +226,7 @@ async def getUserLeaderBoard(username):
                 response = await session.get("https://www.bybit.com/copyTrade/", headers=HEADERS) # Needed to get the cookies
                 response = await session.get(url, headers=HEADERS)
                 cache_leaderboard = response.text 
-            # print(url)
+            print(url)
             json_data = json.loads(cache_leaderboard)
             for leaderRecommendInfoList in json_data['result']['leaderRecommendInfoList']:
                 title = leaderRecommendInfoList['title']
@@ -238,7 +239,7 @@ async def getUserLeaderBoard(username):
                             "position" : position +1, 
                         })
 
-            # print(json.dumps(json_data, indent=4))
+            print(json.dumps(json_data, indent=4))
         except Exception as e:
             print(f"21 An error occurred: {e}")
 
@@ -267,15 +268,18 @@ async def check_traders(ctx, fromTask=False):
         if ctx.channel.id != channelId:
             print('From not authorized channel')
             return
-
+    print(' ici l 270')
     timestamp = int(time.time() * 1000)
 
     traders_info = []
     traders_info2 = []
     # message = await ctx.send("https://i.imgur.com/c4AGtzM.gif", reference=ctx.message) # generate a bug on Cron 
     message = await ctx.send("Loading data, please wait...")
+    print(' ici l 277')
+ 
+    timeout = httpx.Timeout(60.0)  # Timeout total de 60 secondes
 
-    async with httpx.AsyncClient(http2=True) as session:
+    async with httpx.AsyncClient(http2=True, timeout=timeout) as session:
         for infos in copytraders:
             if infos['exchange'] == "bybit":
                 url = f"https://api2.bybit.com/fapi/beehive/public/v1/common/leader-income?timeStamp={timestamp}&leaderMark={infos['bbCode']}"
@@ -284,8 +288,12 @@ async def check_traders(ctx, fromTask=False):
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
             }
                 try:
+                    print(' ici l 288')
+                    print(url)
                     response = await session.get(url, headers=HEADERS) 
+                    print(urlInfo)
                     infosUser = await session.get(urlInfo, headers=HEADERS) 
+                    print(' ici l 291')
                     #print(urlInfo)
                     #print(infosUser)
                     infosUser = json.loads(infosUser.text) 
@@ -365,7 +373,7 @@ async def check_traders(ctx, fromTask=False):
             }
             
                 try:
-                    #print(urlInfo)
+                    print(urlInfo)
                     response = await session.get(url, headers=HEADERS) 
                     infosUser = await session.get(urlInfo, headers=HEADERS) 
                     infosUser = json.loads(infosUser.text) 
