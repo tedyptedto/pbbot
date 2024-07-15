@@ -230,6 +230,9 @@ async def getUserLeaderBoard(username):
             json_data = json.loads(cache_leaderboard)
             for leaderRecommendInfoList in json_data['result']['leaderRecommendInfoList']:
                 title = leaderRecommendInfoList['title']
+                if title == "":
+                    title = leaderRecommendInfoList['leaderTag'].replace('LEADER_TAG_', '')
+
                 for position, users in enumerate(leaderRecommendInfoList['leaderRecommendDetailList']):
                     user = users['nickName']
                     if (user == username):

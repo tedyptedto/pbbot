@@ -2,3 +2,4 @@ config/token.txt
 config/channel_id.txt
 config/stats.json
 config/copytraders.json
+config/copytraders copy.json
