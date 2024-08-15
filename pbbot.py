@@ -17,6 +17,8 @@ import httpx
 import json
 import time
 import requests
+import matplotlib.pyplot as plt
+from datetime import datetime
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -323,6 +325,39 @@ async def check_vaults(ctx, fromTask=False):
 
         await ctx.send("```" + messageToSend + "```")
 
+
+        # Extraire les données de "week"
+        extractPeriod = "week"
+        month_data = None
+        for item in response_json['portfolio']:
+            if item[0] == extractPeriod:
+                month_data = item[1]
+                break
+        if month_data is not None:
+            pnl_history = month_data["pnlHistory"]
+            timestamps = [datetime.fromtimestamp(int(entry[0])/1000) for entry in pnl_history]
+            pnl_values = [float(entry[1]) for entry in pnl_history]
+
+            # Création du graphique
+            plt.figure(figsize=(10, 5))
+            plt.plot(timestamps, pnl_values, marker='o')
+            plt.title('PnL History - ' + extractPeriod)
+            plt.xlabel('Date')
+            plt.ylabel('PnL Value')
+            plt.grid(True)
+
+            # Sauvegarder le graphique
+            plt.savefig('./tmp/pnl_history_month.png')
+
+            # Fermer la figure
+            plt.close()
+            with open('./tmp/pnl_history_month.png', 'rb') as f:
+                picture = discord.File(f)
+                await ctx.send(file=picture)
+        else:
+            print("Aucune donnée trouvée pour 'month'.")
+
+       
 
         vaultLinkMessage = f"\
             **[Vault Link {copytrader['bbUser']}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\

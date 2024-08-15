@@ -4,3 +4,4 @@ config/stats.json
 config/copytraders.json
 config/copytraders copy.json
 config/channel_id_HL.txt
+tmp/*.png
