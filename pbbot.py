@@ -325,6 +325,10 @@ async def check_vaults(ctx, fromTask=False):
 
         await ctx.send("```" + messageToSend + "```")
 
+        vaultLinkMessage = f"\
+            **[Vault Link {copytrader['bbUser']}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
+        "
+        await ctx.send(vaultLinkMessage)
 
         # Extraire les données de "week"
         extractPeriod = "week"
@@ -359,10 +363,6 @@ async def check_vaults(ctx, fromTask=False):
 
        
 
-        vaultLinkMessage = f"\
-            **[Vault Link {copytrader['bbUser']}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
-        "
-        await ctx.send(vaultLinkMessage)
 
 
 
