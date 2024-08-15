@@ -16,6 +16,7 @@ import os
 import httpx
 import json
 import time
+import requests
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -23,6 +24,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 base_dir = os.path.realpath(os.path.dirname(os.path.abspath(__file__))+'/')+'/'
 channelId = int(open(base_dir+"/config/channel_id.txt", 'r').read())
+channelIdHL = int(open(base_dir+"/config/channel_id_HL.txt", 'r').read())
 discordBotId = open(base_dir+"/config/token.txt", 'r').read()
 
 intents = discord.Intents.default()
@@ -256,6 +258,78 @@ async def on_ready():
 
 total_aum = 0
 total_aum2 = 0
+
+@commands.cooldown(1, 2, commands.BucketType.user)
+@bot.command()
+async def check_vaults(ctx, fromTask=False):
+    global channelIdHL
+    if not fromTask:
+        if ctx.channel.id != channelIdHL:
+            print('From not authorized channel')
+            return
+
+    #                                           ### Accounts to check
+    copytraders = []
+    with open(base_dir + '/config/copytraders.json', 'r') as file:
+        copytraders = json.load(file)
+
+    for copytrader in copytraders:
+        if copytrader['exchange'] != 'hyperliquid':
+            continue
+
+        followersEquity = 0.0
+        nbFollowers = 0
+        usdc_value = 0.0
+
+        #                                           ### is Hyperliquid vault
+        url = 'https://api-ui.hyperliquid.xyz/info'
+
+        headers = {
+            'content-type': 'application/json',
+            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
+        }
+
+        data = {
+            "type": "vaultDetails",
+            "vaultAddress": copytrader['bbCode'] 
+        }
+
+        response = requests.post(url, headers=headers, json=data)
+
+        # Afficher le contenu de la réponse
+        response_json = response.json()
+        leaderEquity = 0.0
+        i = 0
+        for followers in response_json['followers']:
+            if i == 0:
+                leaderEquity = float(followers['vaultEquity'])
+            else:
+                followersEquity += float(followers['vaultEquity'])
+                nbFollowers = nbFollowers + 1
+            i = i + 1
+
+        usdc_value = leaderEquity
+
+        apr = response_json['apr'] * 100
+
+        #                                           ### Build message / Discord mobile = 29 caractères
+        messageToSend = ""
+        messageToSend += f"{copytrader['bbUser'].upper():<15} {apr:>12,.0f}%\n"
+        messageToSend += f"..............................\n"
+        if nbFollowers > 0:
+            messageToSend += f"{'NbFollowers':<16} {'Equ. Foll.':>12}\n"
+            messageToSend += f"👥{nbFollowers:<15} {followersEquity:>10,.2f}$\n"
+            messageToSend += f"..............................\n"
+
+        await ctx.send("```" + messageToSend + "```")
+
+
+        vaultLinkMessage = f"\
+            **[Vault Link {copytrader['bbUser']}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
+        "
+        await ctx.send(vaultLinkMessage)
+
+
 
 
 @commands.cooldown(1, 2, commands.BucketType.user)
@@ -500,6 +574,11 @@ def format_aum(aum):
         return f"{aum:.2f}"
 
 async def cronFunction():
+    global channelIdHL
+    channelHL = bot.get_channel(channelIdHL)
+
+    await check_vaults(channelHL, fromTask=True)
+
     global channelId
     channel = bot.get_channel(channelId)
 
