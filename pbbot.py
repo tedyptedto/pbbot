@@ -316,7 +316,7 @@ async def check_vaults(ctx, fromTask=False):
 
         #                                           ### Build message / Discord mobile = 29 caractères
         messageToSend = ""
-        messageToSend += f"{copytrader['bbUser'].upper():<15} {apr:>12,.0f}%\n"
+        messageToSend += f"{(copytrader['bbUser'].upper()+ ' by ' + copytrader['discordUser']):<15} {apr:>12,.0f}%\n"
         messageToSend += f"..............................\n"
         if nbFollowers > 0:
             messageToSend += f"{'NbFollowers':<16} {'Equ. Foll.':>12}\n"
