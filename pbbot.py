@@ -359,7 +359,7 @@ async def check_vaults(ctx, fromTask=False):
                 picture = discord.File(f)
                 await ctx.send(file=picture)
         else:
-            print("Aucune donnée trouvée pour 'month'.")
+            print("Aucune donnée trouvée pour '" + extractPeriod "'.")
 
        
 
