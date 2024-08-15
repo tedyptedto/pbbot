@@ -351,15 +351,15 @@ async def check_vaults(ctx, fromTask=False):
             plt.grid(True)
 
             # Sauvegarder le graphique
-            plt.savefig('./tmp/pnl_history_month.png')
+            plt.savefig('./tmp/pnl_history_' + extractPeriod + '.png')
 
             # Fermer la figure
             plt.close()
-            with open('./tmp/pnl_history_month.png', 'rb') as f:
+            with open('./tmp/pnl_history_' + extractPeriod + '.png', 'rb') as f:
                 picture = discord.File(f)
                 await ctx.send(file=picture)
         else:
-            print("Aucune donnée trouvée pour '" + extractPeriod "'.")
+            print("Aucune donnée trouvée pour '" + extractPeriod + "'.")
 
        
 
