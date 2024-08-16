@@ -314,9 +314,11 @@ async def check_vaults(ctx, fromTask=False):
 
         apr = response_json['apr'] * 100
 
+        user_name = copytrader['bbUser'].upper()+ ' by ' + copytrader['discordUser']
+
         #                                           ### Build message / Discord mobile = 29 caractères
         messageToSend = ""
-        messageToSend += f"{(copytrader['bbUser'].upper()+ ' by ' + copytrader['discordUser'])}\n"
+        messageToSend += f"{(user_name)}\n"
         messageToSend += f"{' ':<15} {apr:>12,.0f}%\n"
         messageToSend += f"..............................\n"
         if nbFollowers > 0:
@@ -327,7 +329,7 @@ async def check_vaults(ctx, fromTask=False):
         await ctx.send("```" + messageToSend + "```")
 
         vaultLinkMessage = f"\
-            **[Vault Link {copytrader['bbUser']}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
+            **[Vault Link {user_name}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
         "
         await ctx.send(vaultLinkMessage)
 
@@ -346,7 +348,7 @@ async def check_vaults(ctx, fromTask=False):
             # Création du graphique
             plt.figure(figsize=(10, 5))
             plt.plot(timestamps, pnl_values, marker='o')
-            plt.title('PnL History - ' + extractPeriod)
+            plt.title('PnL History - ' + user_name)
             plt.xlabel('Date')
             plt.ylabel('PnL Value')
             plt.grid(True)
