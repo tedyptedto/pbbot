@@ -348,7 +348,7 @@ async def check_vaults(ctx, fromTask=False):
             # Création du graphique
             plt.figure(figsize=(10, 5))
             plt.plot(timestamps, pnl_values, marker='o')
-            plt.title('PnL History - ' + user_name)
+            plt.title('PnL History - ' + extractPeriod + " " + user_name)
             plt.xlabel('Date')
             plt.ylabel('PnL Value')
             plt.grid(True)
