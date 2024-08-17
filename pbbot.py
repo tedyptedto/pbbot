@@ -321,7 +321,7 @@ async def check_vaults(ctx, fromTask=False):
         messageToSend += f".............................\n"
         if nbFollowers > 0:
             messageToSend += f"{'NbFollowers':<16} {'Equ. Foll.':>12}\n"
-            messageToSend += f"👥{nbFollowers:<15} {followersEquity:>10,.2f}$\n"
+            messageToSend += f"{str(nbFollowers)+'👥':<16} {followersEquity:>10,.2f}$\n"
             messageToSend += f".............................\n"
 
         await ctx.send("```" + messageToSend + "```")
