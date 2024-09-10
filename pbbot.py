@@ -331,22 +331,23 @@ async def check_vaults(ctx, fromTask=False):
         "
         await ctx.send(vaultLinkMessage)
 
-        # Extraire les données de "week"
-        extractPeriod = "week"
+        # Extraire les données de "allTime"
+        extractPeriod = "allTime"
         month_data = None
         for item in response_json['portfolio']:
             if item[0] == extractPeriod:
                 month_data = item[1]
                 break
         if month_data is not None:
-            pnl_history = month_data["pnlHistory"]
+            dataType = "accountValueHistory"
+            pnl_history = month_data[dataType]
             timestamps = [datetime.fromtimestamp(int(entry[0])/1000) for entry in pnl_history]
             pnl_values = [float(entry[1]) for entry in pnl_history]
 
             # Création du graphique
             plt.figure(figsize=(10, 5))
             plt.plot(timestamps, pnl_values, marker='o')
-            plt.title('PnL History - ' + extractPeriod + " " + user_name)
+            plt.title(dataType + ' - ' + extractPeriod + " " + user_name)
             plt.xlabel('Date')
             plt.ylabel('PnL Value')
             plt.grid(True)
