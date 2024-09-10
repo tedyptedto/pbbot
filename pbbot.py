@@ -342,7 +342,7 @@ async def check_vaults(ctx, fromTask=False):
             dataType = "accountValueHistory"
             pnl_history = month_data[dataType]
             timestamps = [datetime.fromtimestamp(int(entry[0])/1000) for entry in pnl_history]
-            pnl_values = [float(entry[1]) for entry in pnl_history]
+            pnl_values = [float(entry[1]) for entry in pnl_history][2:]
 
             # Création du graphique
             plt.figure(figsize=(10, 5))
