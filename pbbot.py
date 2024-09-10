@@ -344,6 +344,18 @@ async def check_vaults(ctx, fromTask=False):
             timestamps = [datetime.fromtimestamp(int(entry[0])/1000) for entry in pnl_history][2:]
             pnl_values = [float(entry[1]) for entry in pnl_history][2:]
 
+            # Vérifier si la première valeur n'est pas 0
+            if pnl_values:
+                premiere_valeur = pnl_values[0]
+
+                # Si la première valeur est différente de 0, ajuster toutes les autres
+                if premiere_valeur != 0:
+                    # Calculer la différence
+                    difference = premiere_valeur
+
+                    # Ajuster toutes les valeurs en soustrayant la différence
+                    pnl_values = [valeur - difference for valeur in pnl_values]
+
             # Création du graphique
             plt.figure(figsize=(10, 5))
             plt.plot(timestamps, pnl_values, marker='o')
