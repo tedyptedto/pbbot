@@ -316,9 +316,9 @@ async def check_vaults(ctx, fromTask=False):
 
         #                                           ### Build message / Discord mobile = 29 caractères
         vaultLinkMessage = f"\
-            --------------------------------------------------------------------------------------\n\
-            **[Vault Link {user_name}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
-        "
+--------------------------------------------------------------------------------------\n\
+**[Vault Link {user_name}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
+"
         await ctx.send(vaultLinkMessage)
 
 
