@@ -315,21 +315,12 @@ async def check_vaults(ctx, fromTask=False):
         user_name = copytrader['bbUser'].upper()+ ' by ' + copytrader['discordUser']
 
         #                                           ### Build message / Discord mobile = 29 caractères
-        messageToSend = ""
-        messageToSend += f"{(user_name)}\n"
-        messageToSend += f"{str(round(apr)) + '%':<12} {usdc_value:>15,.2f}$\n"
-        messageToSend += f".............................\n"
-        if nbFollowers > 0:
-            messageToSend += f"{'NbFollowers':<16} {'Equ. Foll.':>12}\n"
-            messageToSend += f"{str(nbFollowers)+'👥':<16} {followersEquity:>10,.2f}$\n"
-            messageToSend += f".............................\n"
-
-        await ctx.send("```" + messageToSend + "```")
-
         vaultLinkMessage = f"\
+            --------------------------------------------------------------------------------------\
             **[Vault Link {user_name}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
         "
         await ctx.send(vaultLinkMessage)
+
 
         # Extraire les données de "allTime"
         extractPeriod = "allTime"
@@ -376,6 +367,17 @@ async def check_vaults(ctx, fromTask=False):
             print("Aucune donnée trouvée pour '" + extractPeriod + "'.")
 
        
+
+        messageToSend = ""
+        messageToSend += f"{(user_name)}\n"
+        messageToSend += f"{str(round(apr)) + '%':<12} {usdc_value:>15,.2f}$\n"
+        messageToSend += f".............................\n"
+        if nbFollowers > 0:
+            messageToSend += f"{'NbFollowers':<16} {'Equ. Foll.':>12}\n"
+            messageToSend += f"{str(nbFollowers)+'👥':<16} {followersEquity:>10,.2f}$\n"
+            messageToSend += f".............................\n"
+
+        await ctx.send("```" + messageToSend + "```")
 
 
 
