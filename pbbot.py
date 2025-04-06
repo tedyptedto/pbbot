@@ -2,9 +2,13 @@
 # pip install discord
 # pip install httpx[http2]
 # https://github.com/Rapptz/discord.py
-# créer le bot : https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token
+# create  bot : https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token
 #
 #
+# !add discord_user bb_user bb_code exchange
+# sample : !add mani Gucky_2coin_1dot5x 0x7b71e82ce13e84a6efb081b6e02425ed62898f7b hyperliquid
+
+
 import string
 import discord
 from discord.ext import commands
@@ -87,6 +91,8 @@ async def on_command_error(ctx, error):
         await bot_response.delete()
 
 
+# !add discord_user bb_user bb_code exchange
+# sample : !add mani Gucky_2coin_1dot5x 0x7b71e82ce13e84a6efb081b6e02425ed62898f7b hyperliquid
 
 @bot.command()
 async def add(ctx, discord_user, bb_user, bb_code, exchange):
