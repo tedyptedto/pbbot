@@ -290,7 +290,7 @@ async def check_vaults(ctx, fromTask=False):
         # a cet endroit, il faudrait contacter cet url avant l'appel à la suite 
         # https://vaults-analyser.com/screenshot/preview/0x2e1e1aff25dedf3aae17b6f36d847403f70e196e.png
         # et récupérer son contenu
-        screenshot_url = f"https://vaults-analyser.com/screenshot/preview/{copytrader['bbCode']}.png"
+        screenshot_url = f"https://vaults-analyser.com/screenshot/preview/{copytrader['bbCode']}.png?force_refresh=true"
         image_is_available = False
         # boucler tant qu'on a pas d'images
         is_404 = False
