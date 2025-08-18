@@ -6,15 +6,17 @@
 #
 #
 # !add discord_user bb_user bb_code exchange
-# sample : !add mani Gucky_2coin_1dot5x 0x7b71e82ce13e84a6efb081b6e02425ed62898f7b hyperliquid
+# sample : !add mani Gucky_2coin_1dot5x 0x7b71e82ce13e84a6e        # envoyer screenshot avec embed
 
 
 import string
 import discord
 from discord.ext import commands
 import aiohttp
+import io
 import asyncio
 import time
+from PIL import Image
 from urllib.parse import quote
 import os
 import httpx
@@ -285,105 +287,157 @@ async def check_vaults(ctx, fromTask=False):
         if copytrader['exchange'] != 'hyperliquid':
             continue
 
-        followersEquity = 0.0
-        nbFollowers = 0
-        usdc_value = 0.0
+        # a cet endroit, il faudrait contacter cet url avant l'appel à la suite 
+        # https://vaults-analyser.com/screenshot/preview/0x2e1e1aff25dedf3aae17b6f36d847403f70e196e.png
+        # et récupérer son contenu
+        screenshot_url = f"https://vaults-analyser.com/screenshot/preview/{copytrader['bbCode']}.png"
+        image_is_available = False
+        # boucler tant qu'on a pas d'images
+        is_404 = False
+        await asyncio.sleep(1)
+        async with httpx.AsyncClient() as client:
+            while not image_is_available:
+                print(f'Checking screenshot availability... Url : {screenshot_url}')
+                response = await client.get(screenshot_url)
+                if response.status_code == 200:
+                    # verifier si c'est une image valide
+                    if response.headers['Content-Type'].startswith('image/'):
+                        # verifier que le png est bien formé
+                        try:
+                            img = Image.open(io.BytesIO(response.content))
+                            img.verify()
+                            screenshot_content = response.content
+                            image_is_available = True
+                        except Exception as e:
+                            print(f"Image verification failed: {e}")
+                elif response.status_code == 404:
+                    is_404 = True
+                    # sortir du while
+                    break
+                else:
+                    screenshot_content = None
+                # pause for a moment before checking again
+                await asyncio.sleep(2)
+            print('Done...')
 
-        #                                           ### is Hyperliquid vault
-        url = 'https://api-ui.hyperliquid.xyz/info'
+        if is_404:
+            print('Screenshot not found')
+            continue
 
-        headers = {
-            'content-type': 'application/json',
-            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
-        }
-
-        data = {
-            "type": "vaultDetails",
-            "vaultAddress": copytrader['bbCode'] 
-        }
-
-        response = requests.post(url, headers=headers, json=data)
-
-        # Afficher le contenu de la réponse
-        response_json = response.json()
-        leaderEquity = 0.0
-        for followers in response_json['followers']:
-            if followers['user'] == 'Leader':
-                leaderEquity = float(followers['vaultEquity'])
-            else:
-                followersEquity += float(followers['vaultEquity'])
-                nbFollowers = nbFollowers + 1
-
-        usdc_value = leaderEquity
-
-        apr = response_json['apr'] * 100
-
-        user_name = copytrader['bbUser'].upper()+ ' by ' + copytrader['discordUser']
-
-        #                                           ### Build message / Discord mobile = 29 caractères
-        vaultLinkMessage = f"\
---------------------------------------------------------------------------------------\n\
-**[Vault Link {user_name}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
-"
-        await ctx.send(vaultLinkMessage)
+        # envoyer le message avec l'image cliquable
+        if screenshot_content:
+            embed = discord.Embed(title="🔗 Click here to join "+copytrader['bbUser'].upper(), url=f"https://vaults-analyser.com/detail/alltime/{copytrader['bbCode']}")
+            embed.set_author(name=copytrader['bbUser'].upper() + ' by ' + copytrader['discordUser'], url=f"https://vaults-analyser.com/detail/alltime/{copytrader['bbCode']}")
+            file = discord.File(io.BytesIO(screenshot_content), filename=f"{copytrader['bbCode']}.png")
+            embed.set_image(url=f"attachment://{copytrader['bbCode']}.png")
+            await ctx.send(file=file, embed=embed)
+        
 
 
-        # Extraire les données de "allTime"
-        extractPeriod = "allTime"
-        month_data = None
-        for item in response_json['portfolio']:
-            if item[0] == extractPeriod:
-                month_data = item[1]
-                break
-        if month_data is not None:
-            dataType = "pnlHistory"
-            pnl_history = month_data[dataType]
-            timestamps = [datetime.fromtimestamp(int(entry[0])/1000) for entry in pnl_history][2:]
-            pnl_values = [float(entry[1]) for entry in pnl_history][2:]
+        print('Done...')
 
-            # Vérifier si la première valeur n'est pas 0
-            if pnl_values:
-                premiere_valeur = pnl_values[0]
+        # return
+        continue
 
-                # Si la première valeur est différente de 0, ajuster toutes les autres
-                if premiere_valeur != 0:
-                    # Calculer la différence
-                    difference = premiere_valeur
+#         followersEquity = 0.0
+#         nbFollowers = 0
+#         usdc_value = 0.0
 
-                    # Ajuster toutes les valeurs en soustrayant la différence
-                    pnl_values = [valeur - difference for valeur in pnl_values]
+#         #                                           ### is Hyperliquid vault
+#         url = 'https://api-ui.hyperliquid.xyz/info'
 
-            # Création du graphique
-            plt.figure(figsize=(10, 5))
-            plt.plot(timestamps, pnl_values, marker='o')
-            plt.title(dataType + ' - ' + extractPeriod + " " + user_name)
-            plt.xlabel('Date')
-            plt.ylabel('PnL Value')
-            plt.grid(True)
+#         headers = {
+#             'content-type': 'application/json',
+#             'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
+#         }
 
-            # Sauvegarder le graphique
-            plt.savefig('./tmp/pnl_history_' + extractPeriod + '.png')
+#         data = {
+#             "type": "vaultDetails",
+#             "vaultAddress": copytrader['bbCode'] 
+#         }
 
-            # Fermer la figure
-            plt.close()
-            with open('./tmp/pnl_history_' + extractPeriod + '.png', 'rb') as f:
-                picture = discord.File(f)
-                await ctx.send(file=picture)
-        else:
-            print("Aucune donnée trouvée pour '" + extractPeriod + "'.")
+#         response = requests.post(url, headers=headers, json=data)
+
+#         # Afficher le contenu de la réponse
+#         response_json = response.json()
+#         leaderEquity = 0.0
+#         for followers in response_json['followers']:
+#             if followers['user'] == 'Leader':
+#                 leaderEquity = float(followers['vaultEquity'])
+#             else:
+#                 followersEquity += float(followers['vaultEquity'])
+#                 nbFollowers = nbFollowers + 1
+
+#         usdc_value = leaderEquity
+
+#         apr = response_json['apr'] * 100
+
+#         user_name = copytrader['bbUser'].upper()+ ' by ' + copytrader['discordUser']
+
+#         #                                           ### Build message / Discord mobile = 29 caractères
+#         vaultLinkMessage = f"\
+# --------------------------------------------------------------------------------------\n\
+# **[Vault Link {user_name}](https://app.hyperliquid.xyz/vaults/{copytrader['bbCode']})**\
+# "
+#         await ctx.send(vaultLinkMessage)
+
+
+#         # Extraire les données de "allTime"
+#         extractPeriod = "allTime"
+#         month_data = None
+#         for item in response_json['portfolio']:
+#             if item[0] == extractPeriod:
+#                 month_data = item[1]
+#                 break
+#         if month_data is not None:
+#             dataType = "pnlHistory"
+#             pnl_history = month_data[dataType]
+#             timestamps = [datetime.fromtimestamp(int(entry[0])/1000) for entry in pnl_history][2:]
+#             pnl_values = [float(entry[1]) for entry in pnl_history][2:]
+
+#             # Vérifier si la première valeur n'est pas 0
+#             if pnl_values:
+#                 premiere_valeur = pnl_values[0]
+
+#                 # Si la première valeur est différente de 0, ajuster toutes les autres
+#                 if premiere_valeur != 0:
+#                     # Calculer la différence
+#                     difference = premiere_valeur
+
+#                     # Ajuster toutes les valeurs en soustrayant la différence
+#                     pnl_values = [valeur - difference for valeur in pnl_values]
+
+#             # Création du graphique
+#             plt.figure(figsize=(10, 5))
+#             plt.plot(timestamps, pnl_values, marker='o')
+#             plt.title(dataType + ' - ' + extractPeriod + " " + user_name)
+#             plt.xlabel('Date')
+#             plt.ylabel('PnL Value')
+#             plt.grid(True)
+
+#             # Sauvegarder le graphique
+#             plt.savefig('./tmp/pnl_history_' + extractPeriod + '.png')
+
+#             # Fermer la figure
+#             plt.close()
+#             with open('./tmp/pnl_history_' + extractPeriod + '.png', 'rb') as f:
+#                 picture = discord.File(f)
+#                 await ctx.send(file=picture)
+#         else:
+#             print("Aucune donnée trouvée pour '" + extractPeriod + "'.")
 
        
 
-        messageToSend = ""
-        messageToSend += f"{(user_name)}\n"
-        messageToSend += f"{str(round(apr)) + '%':<12} {usdc_value:>15,.2f}$\n"
-        messageToSend += f".............................\n"
-        if nbFollowers > 0:
-            messageToSend += f"{'NbFollowers':<16} {'Equ. Foll.':>12}\n"
-            messageToSend += f"{str(nbFollowers)+'👥':<16} {followersEquity:>10,.2f}$\n"
-            messageToSend += f".............................\n"
+#         messageToSend = ""
+#         messageToSend += f"{(user_name)}\n"
+#         messageToSend += f"{str(round(apr)) + '%':<12} {usdc_value:>15,.2f}$\n"
+#         messageToSend += f".............................\n"
+#         if nbFollowers > 0:
+#             messageToSend += f"{'NbFollowers':<16} {'Equ. Foll.':>12}\n"
+#             messageToSend += f"{str(nbFollowers)+'👥':<16} {followersEquity:>10,.2f}$\n"
+#             messageToSend += f".............................\n"
 
-        await ctx.send("```" + messageToSend + "```")
+#         await ctx.send("```" + messageToSend + "```")
 
 
 
@@ -642,10 +696,17 @@ async def cronFunction():
     await check_traders(channel, fromTask=True)
 
 
-scheduler = AsyncIOScheduler()
-scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
-# scheduler.add_job(cronFunction, 'interval', seconds=5)
+async def main():
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(cronFunction, CronTrigger(hour="8", minute="0", second="0"))
+    # scheduler.add_job(cronFunction, 'interval', seconds=5)
+    
+    scheduler.start()
+    
+    try:
+        await bot.start(discordBotId)
+    finally:
+        await bot.close()
 
-scheduler.start()
-
-bot.run(discordBotId)
+# Run the bot with asyncio
+asyncio.run(main())
