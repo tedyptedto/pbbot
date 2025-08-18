@@ -12,6 +12,8 @@
 import string
 import discord
 from discord.ext import commands
+import traceback
+
 import aiohttp
 import io
 import asyncio
@@ -272,72 +274,83 @@ total_aum2 = 0
 @commands.cooldown(1, 2, commands.BucketType.user)
 @bot.command()
 async def check_vaults(ctx, fromTask=False):
-    global channelIdHL
-    if not fromTask:
-        if ctx.channel.id != channelIdHL:
-            print('From not authorized channel')
-            return
+    try:
+        global channelIdHL
+        if not fromTask:
+            if ctx.channel.id != channelIdHL:
+                print('From not authorized channel')
+                return
 
-    #                                           ### Accounts to check
-    copytraders = []
-    with open(base_dir + '/config/copytraders.json', 'r') as file:
-        copytraders = json.load(file)
+        #                                           ### Accounts to check
+        copytraders = []
+        with open(base_dir + '/config/copytraders.json', 'r') as file:
+            copytraders = json.load(file)
 
-    for copytrader in copytraders:
-        if copytrader['exchange'] != 'hyperliquid':
-            continue
+        for copytrader in copytraders:
+            if copytrader['exchange'] != 'hyperliquid':
+                continue
 
-        # a cet endroit, il faudrait contacter cet url avant l'appel à la suite 
-        # https://vaults-analyser.com/screenshot/preview/0x2e1e1aff25dedf3aae17b6f36d847403f70e196e.png
-        # et récupérer son contenu
-        screenshot_url = f"https://vaults-analyser.com/screenshot/preview/{copytrader['bbCode']}.png?force_refresh=true"
-        image_is_available = False
-        # boucler tant qu'on a pas d'images
-        is_404 = False
-        await asyncio.sleep(1)
-        async with httpx.AsyncClient() as client:
-            while not image_is_available:
-                print(f'Checking screenshot availability... Url : {screenshot_url}')
-                response = await client.get(screenshot_url)
-                if response.status_code == 200:
-                    # verifier si c'est une image valide
-                    if response.headers['Content-Type'].startswith('image/'):
-                        # verifier que le png est bien formé
-                        try:
-                            img = Image.open(io.BytesIO(response.content))
-                            img.verify()
-                            screenshot_content = response.content
-                            image_is_available = True
-                        except Exception as e:
-                            print(f"Image verification failed: {e}")
-                elif response.status_code == 404:
-                    is_404 = True
-                    # sortir du while
-                    break
-                else:
-                    screenshot_content = None
-                # pause for a moment before checking again
-                await asyncio.sleep(2)
+            # a cet endroit, il faudrait contacter cet url avant l'appel à la suite 
+            # https://vaults-analyser.com/screenshot/preview/0x2e1e1aff25dedf3aae17b6f36d847403f70e196e.png
+            # et récupérer son contenu
+            screenshot_url = f"https://vaults-analyser.com/screenshot/preview/{copytrader['bbCode']}.png?force_refresh=true"
+            image_is_available = False
+            # boucler tant qu'on a pas d'images
+            is_404 = False
+            await asyncio.sleep(1)
+            async with httpx.AsyncClient() as client:
+                while not image_is_available:
+                    print(f'Checking screenshot availability... Url : {screenshot_url}')
+                    try:
+                        # augmenter le timeout
+                        response = await client.get(screenshot_url, timeout=20)
+                    except Exception as e:
+                        print(f"Error getting screenshoot")
+                        continue
+                    if response.status_code == 200:
+                        # verifier si c'est une image valide
+                        if response.headers['Content-Type'].startswith('image/'):
+                            # verifier que le png est bien formé
+                            try:
+                                img = Image.open(io.BytesIO(response.content))
+                                img.verify()
+                                screenshot_content = response.content
+                                image_is_available = True
+                            except Exception as e:
+                                print(f"Image verification failed: {e}")
+                    elif response.status_code == 404:
+                        is_404 = True
+                        # sortir du while
+                        break
+                    else:
+                        screenshot_content = None
+                    # pause for a moment before checking again
+                    await asyncio.sleep(2)
+                print('Done...')
+
+            if is_404:
+                print('Screenshot not found')
+                continue
+
+            # envoyer le message avec l'image cliquable
+            if screenshot_content:
+                embed = discord.Embed(title="🔗 Click here to join "+copytrader['bbUser'].upper(), url=f"https://vaults-analyser.com/detail/alltime/{copytrader['bbCode']}")
+                embed.set_author(name=copytrader['bbUser'].upper() + ' by ' + copytrader['discordUser'], url=f"https://vaults-analyser.com/detail/alltime/{copytrader['bbCode']}")
+                file = discord.File(io.BytesIO(screenshot_content), filename=f"{copytrader['bbCode']}.png")
+                embed.set_image(url=f"attachment://{copytrader['bbCode']}.png")
+                await ctx.send(file=file, embed=embed)
+            
+
+
             print('Done...')
 
-        if is_404:
-            print('Screenshot not found')
+            # return
             continue
+    except Exception as e:
+        print(f"Top level error in check_vaults: {str(e)}")
+        traceback.print_exc()
+        raise
 
-        # envoyer le message avec l'image cliquable
-        if screenshot_content:
-            embed = discord.Embed(title="🔗 Click here to join "+copytrader['bbUser'].upper(), url=f"https://vaults-analyser.com/detail/alltime/{copytrader['bbCode']}")
-            embed.set_author(name=copytrader['bbUser'].upper() + ' by ' + copytrader['discordUser'], url=f"https://vaults-analyser.com/detail/alltime/{copytrader['bbCode']}")
-            file = discord.File(io.BytesIO(screenshot_content), filename=f"{copytrader['bbCode']}.png")
-            embed.set_image(url=f"attachment://{copytrader['bbCode']}.png")
-            await ctx.send(file=file, embed=embed)
-        
-
-
-        print('Done...')
-
-        # return
-        continue
 
 #         followersEquity = 0.0
 #         nbFollowers = 0
