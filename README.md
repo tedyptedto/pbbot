@@ -3,6 +3,8 @@
 git clone https://github.com/tedyptedto/pbbot.git
 
 # TODO
+@TODO : Need to sort by sharpeRatio
+@TODO : pbbot can take screenshoot without disturbing VA.com ([screen-scraper](https://shot-scraper.datasette.io/en/stable/installation.html#shot-scraper-install-help))
 
 change code cooldown without rate limit
 
@@ -10,10 +12,6 @@ change code cooldown without rate limit
 ~/pbbot$ python -m venv venv
 source venv/bin/activate
 
-pip install discord
-pip install httpx
-pip install requests
-pip install matplotlib
-pip install apscheduler
+pip install discord httpx requests matplotlib apscheduler
 
 python3 pbbot.py 
