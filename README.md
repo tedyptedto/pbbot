@@ -6,7 +6,6 @@ git clone https://github.com/tedyptedto/pbbot.git
 @TODO : Need to sort by sharpeRatio
 @TODO : pbbot can take screenshoot without disturbing VA.com ([screen-scraper](https://shot-scraper.datasette.io/en/stable/installation.html#shot-scraper-install-help))
 
-change code cooldown without rate limit
 
 
 ~/pbbot$ python -m venv venv
