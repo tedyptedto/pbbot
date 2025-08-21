@@ -11,6 +11,6 @@ git clone https://github.com/tedyptedto/pbbot.git
 ~/pbbot$ python -m venv venv
 source venv/bin/activate
 
-pip install discord httpx requests matplotlib apscheduler
+pip install discord httpx requests matplotlib apscheduler httpx[http2]
 
 python3 pbbot.py 
